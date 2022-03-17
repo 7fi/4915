@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Task Manager / Timer</title>
 </head>
 <body id="body">
     <div id="header">
@@ -19,17 +19,31 @@
             </div>
         </div>  
 
-        <h1 id="tasksLabel">Tasks:</h1>
         <div id="listContainer">
-            <ul>
-                <li>Someday this will work</li>
-                <li>Or maybe not</li>
-            </ul>
+            <div id="taskFormContainer">
+                <form id="taskForm">
+                    <input type="text" id="taskInput" placeholder="Enter Task">
+                    <!-- <input type="submit" id="taskSubmit" value="Add Task"> -->
+                </form>
+            </div>
+
+            <div id="taskList">
+                <!-- <div class="task">
+                    <div class="content">
+                        <input type="text" class="text" value="Test Task" readonly>
+                    </div>
+                    <div class="actions">
+                        <button class="edit">Edit</button>
+                        <button class="delete">Delete</button>
+                    </div>
+                </div> -->
+            </div>
         </div>
 
         <div id="timeInputBox">
-            <input id="timeInput" placeholder="Enter end time">
-            <button onclick="enterTime()" id="enterButton">Set Time</button>
+            <form id="timeForm">
+                <input id="timeInput" placeholder="Enter end time">
+            </form>
         </div>
     </div>
     <div id="footer">
