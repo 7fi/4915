@@ -1,0 +1,79 @@
+#body{
+    background-color: #333;
+}
+
+#header{
+    background-color: #444;
+    width: 100%;
+    height: 8%;
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+#title{
+    font-size: 50px;
+    margin: 10px;
+}
+#mainBody{
+    position: absolute;
+    top:8%;
+    left: 0;
+    right: 0;
+    bottom: 3%;
+    padding: 10px;
+}
+
+#timer{
+    background-color: #555;
+    border-radius: 10px;
+    width: fit-content;
+    margin: 10px;
+}
+#timerNumbers{
+    color:darkgray;
+    font-size: 40px;
+    margin: 10px;
+}
+#timerContainer{
+    width: 100%;
+    position: fixed;
+    bottom: 3%;
+    display: flex;
+    justify-content: center;
+}
+
+#listContainer{
+    
+}
+#tasksLabel{
+    margin: 0;
+}
+
+#timeInputBox{
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    margin: 10px;
+    width: fit-content;
+}
+#timeInput{
+    width: 90px;
+}
+#enterButton{
+    background-color: #444;
+}
+
+#footer{
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 3%;
+    background-color: #444;
+    display: flex;
+    justify-content: center;
+}
+#footerText{
+    /* text-align: center; */
+    margin: 5px;
+}
