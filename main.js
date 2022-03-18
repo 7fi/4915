@@ -5,11 +5,14 @@ let hasCleanupAlerted = false;
 let timeEntered = false;
 let muted = false;
 
+var taskVals = [];
 var tasks = [];
 
 const timerContainer = document.getElementById("timer");
 const timer = document.getElementById('timerNumbers');
 const timeForm = document.getElementById("timeForm");
+
+const listContainer = document.querySelector("#taskList");
 
 setInterval(updateTime, 1000);
 
@@ -22,7 +25,7 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const task = input.value;
-
+    
     if(!task){
         alert("Please fill in task");
         return;
@@ -30,6 +33,8 @@ form.addEventListener('submit', (e) => {
 
     const taskEl = document.createElement("div");
     taskEl.classList.add("task");
+    taskEl.classList.add("draggable");
+    taskEl.setAttribute("draggable", "true");
     
     const taskContentEl = document.createElement("div");
     taskContentEl.classList.add("content");
@@ -48,23 +53,29 @@ form.addEventListener('submit', (e) => {
 
     const taskActionsEl = document.createElement("div");
     taskActionsEl.classList.add("actions");
-    
+
     const taskEditEl = document.createElement("button");
     taskEditEl.classList.add("edit");
     taskEditEl.innerHTML = "Edit";
 
     const taskDeleteEl = document.createElement("button");
     taskDeleteEl.classList.add("delete");
-    taskDeleteEl.innerHTML = "Delete";
+    taskDeleteEl.innerHTML = "X";
 
     taskActionsEl.appendChild(taskEditEl);
     taskActionsEl.appendChild(taskDeleteEl);
 
     taskEl.appendChild(taskActionsEl);
 
+    taskEl.addEventListener('dragstart', () =>{
+        taskEl.classList.add('dragging');
+    })
+    taskEl.addEventListener('dragend', () =>{
+        taskEl.classList.remove('dragging');
+    })
+
     listEl.appendChild(taskEl);
 
-    console.log("Form submitted");
     input.value = "";
 
     taskEditEl.addEventListener('click', () => {
@@ -85,6 +96,33 @@ form.addEventListener('submit', (e) => {
     })
 
 })
+listContainer.addEventListener('dragover', e => {
+    e.preventDefault();
+
+    const afterElement = getDragAfterElement(e.clientY);
+    const draggingEl = document.querySelector('.dragging');
+
+    if(afterElement == null){
+        listContainer.appendChild(draggingEl);
+    } else{
+        listContainer.insertBefore(draggingEl, afterElement);
+    }
+})
+
+function getDragAfterElement(y){
+    const draggableEls = [...listContainer.querySelectorAll('.draggable:not(.dragging)')];
+
+    return draggableEls.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height;
+
+        if(offset < 0 && offset > closest.offset){
+            return{offset: offset, element:child};
+        }else{
+            return closest;
+        }
+    },{offset: Number.NEGATIVE_INFINITY}).element;
+}
 
 timeForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -106,12 +144,13 @@ function updateTime(){
 
     if(time > 0){
         timer.innerHTML = `${hours}:${minutes}:${seconds}`;
-        document.title = `Time Left: ${hours}:${minutes}:${seconds}`;
+        document.title = `${hours}:${minutes}:${seconds}`;
         time--;
     }else{
         if(!hasEndAlerted && timeEntered == true){
             alert("Time has run out!");
             hasEndAlerted = true;
+            document.title = "Time's Up!";
         }
         timer.innerHTML = "No time left!";
     }
@@ -132,7 +171,6 @@ function enterTime(){
             hours += 12;
         }
         endTime = Number(hours) + (Number(minutes) / 60);
-        console.log(hours + " " + minutes / 60);
     }else{
         endTime = Number(document.getElementById("timeInput").value);
         if(curTime > 12 * 3600 && endTime < 13){
@@ -157,4 +195,3 @@ function enterTime(){
         hasCleanupAlerted = false;
     }
 }
-
