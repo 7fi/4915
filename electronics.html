@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js" defer></script>
+    <title>Task Manager / Timer</title>
+</head>
+<body id="body">
+    <div id="header">
+        <a id="title" href="index.html">Electronics Info & Tasks</a>
+
+        <div id="navContainer">
+            <div id="navBar">
+                <a class="navLink" href="mechanics.html">Mechanics</a>
+                <a class="navLink" href="electronics.html" style="opacity:0.6;">Electronics</a>
+                <a class="navLink" href="electronics.html">Programming</a>
+                <a class="navLink" href="electronics.html">Marketing</a>
+                <a class="navLink" href="electronics.html">Design</a>
+            </div>
+        </div>
+    </div>
+    <div id="test" style="display:none;background-color: red;width: 50%;left: 0;position: absolute;height: 100%;"></div>
+    <div id="mainBody">
+        <div id="timerContainer">
+            <div id="timer">
+                <p id="timerNumbers"></p>
+            </div>
+        </div>  
+
+        <div id="listContainer">
+            <div id="taskFormContainer">
+                <form id="taskForm">
+                    <input type="text" id="taskInput" placeholder="Enter Task">
+                    <!-- <input type="submit" id="taskSubmit" value="Add Task"> -->
+                </form>
+            </div>
+
+            <div id="taskList">
+                <!-- <div class="task">
+                    <div class="content">
+                        <input type="text" class="text" value="Test Task" readonly>
+                    </div>
+                    <div class="actions">
+                        <button class="priorityUp">▲</button> 
+                        <button class="priorityDown">▼</button> 
+                        <button class="edit">Edit</button>
+                        <button class="delete">Delete</button>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+        <div id="timeInputBox">
+            <form id="timeForm">
+                <input id="timeInput" placeholder="Enter end time">
+            </form>
+        </div>
+    </div>
+    
+    <div id="helpfulContainer">
+        <a href="https://drive.google.com/drive/folders/1WWIvF7vMUUsHa2GpLz8pmJplL16mGoq9?usp=sharing" class="links" target="_blank">Electronics Drive</a>
+        <a href="https://docs.google.com/spreadsheets/d/1MYuhzXvHybz8epaoaVxi77-pv-8TNMH0DWrhHGLfTOU/edit#gid=0" class="links" target="_blank">2022 Control Map</a>
+        <a href="https://docs.google.com/spreadsheets/d/1guOwbumfW5tn7LN0kxHV6mpnA9Q1Y-6d5fv4wb0HfE8/edit?usp=sharing" class="links" target="_blank">2022 Packing List</a>
+        <a href="https://github.com/spartronics4915" class="links" target="_blank">Spartronics Github</a>
+        <a href="https://github.com/Spartronics4915/2022-RapidReact" class="links" target="_blank">2022 Code</a>
+        <a href="https://github.com/7fi" class="links" target="_blank">7fi GitHub</a>
+    </div>
+    <div id="footer">
+        <a id="footerText" href="https://github.com/7fi" target="_blank">Site by 7fi</a>
+    </div>
+
+</body>
+
+</html>
