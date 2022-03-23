@@ -9,9 +9,11 @@ app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
 const database = new Datastore('database.db');
-database.loadDatabase();
+// database.loadDatabase();
 var Etasks = [];
 var Mtasks = [];
+
+var endTime;
 
 app.post('/newTask', (request,response) => {
     var data = request.body;
@@ -65,6 +67,14 @@ app.post('/moveTask', (request,response) => {
         })
     }
 });
+app.post('/setTime', (request,response) => {
+    endTime = request.body.value;
+    console.log(endTime);
+    response.json({
+        status:"sucess",
+        endTime: endTime
+    })
+});
 
 app.get('/updatetasks', (request, response) => {
     if(request.rawHeaders.join().includes('electronics')){
@@ -78,4 +88,11 @@ app.get('/updatetasks', (request, response) => {
             tasks: Mtasks
         })
     }
+});
+
+app.get('/getTime', (request, response) => {
+    response.json({
+        status:"sucess",
+        endTime: endTime
+    })
 });

@@ -8,6 +8,8 @@ var taskVals = [];
 var tasks = [];
 var options = {};
 
+let endTime;
+
 //Timer elements
 const timerContainer = document.getElementById("timer");
 const timer = document.getElementById('timerNumbers');
@@ -27,25 +29,25 @@ setInterval(startup, 2000);
 startup();
 async function startup(){
     tasks = [];
-    const response = await fetch('/updateTasks');
-    const json = await response.json();
+    var response = await fetch('/updateTasks');
+    var json = await response.json();
     console.log(json);
 
-    var isDifferent = false;
+    var tasksDifferent = false;
     var children = listContainer.children;
     if(children.length > 0){
         for (let i = 0; i < json.tasks.length; i++) {
-            // console.log(json.tasks[i]);
-            // console.log(children[i].firstChild.firstChild.value);
+            console.log(json.tasks[i]);
+            console.log(children[i].firstChild.firstChild.value);
             if(json.tasks[i] != children[i].firstChild.firstChild.value){
-                isDifferent = true;
+                tasksDifferent = true;
                 break;
             }
         }
     }else{
-        isDifferent = true;
+        tasksDifferent = true;
     }
-    if(isDifferent){
+    if(tasksDifferent){
         while (listContainer.firstChild) {
             listContainer.removeChild(listContainer.firstChild);
         }
@@ -56,6 +58,15 @@ async function startup(){
         }
     }else{
         console.log("wasnt different");
+    }
+
+    response = await fetch('/getTime');
+    json = await response.json();
+    console.log(json);
+
+    if(json.endTime != endTime){
+        // document.getElementById("timeInput").value = json.endTime;
+        enterTime(json.endTime);
     }
 }
 
@@ -284,26 +295,43 @@ function updateTime(){
 }
 
 // Calculates and updates the current time
-function enterTime(){
+async function enterTime(inputTime){
     var today = new Date();
     let curTime = (today.getHours() * 60 * 60) + (today.getMinutes() * 60) + (today.getSeconds());
-    let endTime = document.getElementById("timeInput").value;
-    
-    if(endTime.includes(":")){
-        var tempArray = endTime.split(':'),hours = Number(tempArray[0]), minutes = Number(tempArray[1]);
-        if(curTime > 12 * 3600 && hours < 13){
-            hours += 12;
+    if(!inputTime){
+        
+        endTime = document.getElementById("timeInput").value;
+        
+        if(endTime.includes(":")){
+            var tempArray = endTime.split(':'),hours = Number(tempArray[0]), minutes = Number(tempArray[1]);
+            if(curTime > 12 * 3600 && hours < 13){
+                hours += 12;
+            }
+            endTime = Number(hours) + (Number(minutes) / 60);
+        }else{
+            endTime = Number(document.getElementById("timeInput").value);
+            if(curTime > 12 * 3600 && endTime < 13){
+                endTime += 12;
+            }
         }
-        endTime = Number(hours) + (Number(minutes) / 60);
+
+        console.log(endTime);
+        endTime *= 3600;
+
+        var val = {value: endTime};
+        options = {method:"POST",headers:{"Content-Type":"application/json"},
+            body: JSON.stringify(val)
+        };
+        const response = await fetch('/setTime', options);
+        const json = await response.json();
+        console.log(json);
     }else{
-        endTime = Number(document.getElementById("timeInput").value);
-        if(curTime > 12 * 3600 && endTime < 13){
-            endTime += 12;
-        }
+        endTime = inputTime;
     }
 
-    console.log(endTime);
-    endTime *= 3600;
+    
+
+    document.getElementById("timeInput").value = "";
 
     timerContainer.style.backgroundColor = "#333";
 
