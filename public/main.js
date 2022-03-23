@@ -39,7 +39,7 @@ async function startup(){
     console.log(json);
 
     var tasksDifferent = false;
-    if(listContainer){ // if this page even has tasks
+    if(listContainer != null){ // if this page even has tasks
         var children = listContainer.children;
         if(children.length > 0){
             for (let i = 0; i < json.tasks.length; i++) {

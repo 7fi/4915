@@ -139,6 +139,11 @@ app.get('/updateTasks', (request, response) => {
             tasks: Ptasks,
             endTime: endTime
         })
+    }else{
+        response.json({
+            status:"sucess",
+            endTime: endTime
+        })
     }
 });
 
