@@ -26,6 +26,11 @@ const listEl = document.getElementById("taskList");
 // console.log(taskEl.firstChild.firstChild.value);
 
 setInterval(startup, 2000);
+setInterval(syncTime, 10000);
+function syncTime(){
+    enterTime(endTime);
+}
+
 startup();
 async function startup(){
     tasks = [];
@@ -38,9 +43,9 @@ async function startup(){
         var children = listContainer.children;
         if(children.length > 0){
             for (let i = 0; i < json.tasks.length; i++) {
-                console.log(json.tasks[i]);
-                console.log(children[i].firstChild.firstChild.value);
-                if(json.tasks[i] != children[i].firstChild.firstChild.value){
+                // console.log(json.tasks[i]);
+                // console.log(children[i].firstChild.firstChild.value);
+                if(json.tasks[i] != children[i].firstChild.firstChild.value & children[i].children[1].firstChild.innerText != 'SAVE'){
                     tasksDifferent = true;
                     break;
                 }
@@ -57,13 +62,13 @@ async function startup(){
                 const element = json.tasks[i];
                 createTask(element, false);
             }
+            console.log("was different or empty");
         }else{
             console.log("wasnt different");
         }
     }
 
     if(json.endTime != endTime){
-        // document.getElementById("timeInput").value = json.endTime;
         enterTime(json.endTime);
     }
 }
@@ -219,7 +224,7 @@ async function createTask(value, isNew){
     })
 
     //Add event listener for edit button
-    taskEditEl.addEventListener('click', () => {
+    taskEditEl.addEventListener('click', async () => {
         if(taskEditEl.innerText.toLowerCase() == "edit"){
             taskInputEl.removeAttribute("readonly");
             taskInputEl.focus();
@@ -227,7 +232,15 @@ async function createTask(value, isNew){
         }else{
             taskInputEl.setAttribute("readonly", "readonly");
             taskEditEl.innerText = "Edit";
-            console.log(tasks);
+            buildTasks();
+            var val = {index: tasks.indexOf(taskEl.firstChild.firstChild.value),value: taskEl.firstChild.firstChild.value};
+            options = {method:"POST",headers:{"Content-Type":"application/json"},
+                body: JSON.stringify(val)
+            };
+            const response = await fetch('/editTask', options);
+            const json = await response.json();
+            console.log(json);
+            // console.log(tasks);
         }
     })
 
@@ -274,9 +287,12 @@ function updateTime(){
         timer.innerHTML = "No time left!";
     }
     if(time < 600 & !hasCleanupAlerted & timeEntered == true){
-        alert("Time to clean up!");
+        // alert("Time to clean up!");
+        // timerContainer.style.backgroundColor = '#f00'; // document.documentElement.style.getPropertyValue('--warn')
         hasCleanupAlerted = true;
-        timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--warn');
+    }
+    if(time < 600 & timerContainer.style.backgroundColor != '#f00'){
+        timerContainer.style.backgroundColor = '#f00'; // document.documentElement.style.getPropertyValue('--warn')
     }
 }
 
@@ -300,10 +316,10 @@ async function enterTime(inputTime){
                 endTime += 12;
             }
         }
-
+        
         console.log(endTime);
         endTime *= 3600;
-
+        
         var val = {value: endTime};
         options = {method:"POST",headers:{"Content-Type":"application/json"},
             body: JSON.stringify(val)
@@ -311,24 +327,24 @@ async function enterTime(inputTime){
         const response = await fetch('/setTime', options);
         const json = await response.json();
         console.log(json);
-
+        timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
+    
     }else{
         endTime = inputTime;
     }
 
     document.getElementById("timeInput").value = "";
 
-    timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
-
+    
     time = endTime - curTime;  
     time = Math.floor(time);
-
+    
     console.log(inputTime);
-
+    
     if(time < 1 && inputTime == undefined){
         alert("Time invalid (already passed)");
         time = 0;
-    }else if(inputTime == undefined){
+    }else if(time > 0){
         timeEntered = true;
         hasEndAlerted = false;
         hasCleanupAlerted = false;

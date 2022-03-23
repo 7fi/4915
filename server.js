@@ -19,9 +19,7 @@ var endTime;
 //Creating, moving, and deleting tasks
 app.post('/newTask', (request,response) => {
     var data = request.body;
-    // console.log(request.rawHeaders);
     if(request.rawHeaders.join().includes('electronics')){
-        console.log("something is recieved")
         Etasks.push(data.value);
         response.json({
             status:"sucess",
@@ -35,6 +33,29 @@ app.post('/newTask', (request,response) => {
         })
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks.push(data.value);
+        response.json({
+            status:"sucess",
+            tasks: Ptasks
+        })
+    }
+});
+
+app.post('/editTask', (request,response) => {
+    var data = request.body;
+    if(request.rawHeaders.join().includes('electronics')){
+        Etasks[data.index] = data.value;
+        response.json({
+            status:"sucess",
+            tasks: Etasks
+        })
+    }else if(request.rawHeaders.join().includes('mechanics')){
+        Mtasks[data.index] = data.value;
+        response.json({
+            status:"sucess",
+            tasks: Mtasks
+        })
+    }else if(request.rawHeaders.join().includes('programming')){
+        Ptasks[data.index] = data.value;
         response.json({
             status:"sucess",
             tasks: Ptasks
@@ -87,6 +108,7 @@ app.post('/moveTask', (request,response) => {
         })
     }
 });
+
 app.post('/setTime', (request,response) => {
     console.log(endTime);
     endTime = request.body.value;
