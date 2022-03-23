@@ -1,5 +1,27 @@
+:root{
+    --highlight:#fff;
+    --light:#8f8f8f;
+    --medLight:#666;
+    --midLight:#444;
+    --medium:#333;
+    --medDark:#3b3b3b;
+    --dark:#222;
+    --warn:#f00;
+}
+/* :root{
+    --highlight:#fff;
+    --light:#f7d514;
+    --medLight:#0a2bbb;
+    --midLight:#002fff;
+    --medium:#1d1094;
+    --medDark:#1310b3;
+    --dark:#f7d514;
+    --shadow:#222;
+    --warn:#f00;
+} */
+
 #body{
-    background-color: #444;
+    background-color: var(--midLight);
     font-family: 'Fira sans', sans-serif;
     display: grid;
     grid-template-columns: auto 300px;
@@ -14,14 +36,14 @@
 }
 a{
     text-decoration: none;
-    color:#fff;
+    color:var(--highlight);
 }
 a:visited{
-    color: #fff;
+    color: var(--highlight);
 }
 
 #header{
-    background-color: #333;
+    background-color: var(--medium);
     grid-area: header;
     display: flex;
     flex-direction: row;
@@ -37,7 +59,7 @@ a:visited{
     font-weight: 600;
     margin:5px;
     pointer-events: all;
-    color:#8f8f8f;
+    color:var(--light);
 }
 
 #title{
@@ -54,14 +76,14 @@ a:visited{
 }
 
 #timer{
-    background-color: #333;
+    background-color: var(--medium);
     border-radius: 10px;
     width: fit-content;
     margin: 10px;
-    box-shadow: #222 4px 4px;
+    box-shadow: var(--shadow) 4px 4px;
 }
 #timerNumbers{
-    color:#fff;
+    color:var(--highlight);
     font-size: 40px;
     margin: 10px;
 }
@@ -87,8 +109,8 @@ input,button{
     background: none;
 }
 #taskInput{
-    box-shadow: #222 2px 2px;
-    background-color: #333;
+    box-shadow: var(--shadow) 2px 2px;
+    background-color: var(--medium);
     border-radius: 5px;
     padding: 5px;
     font-size: 30px;
@@ -104,7 +126,7 @@ input,button{
     overflow: auto;
 }
 .task{
-    background-color: #222;
+    background-color: var(--dark);
     border-radius: 5px;
     display: flex;
     flex-direction: row;
@@ -122,7 +144,7 @@ input,button{
     width: fit-content;
 }
 .content .text:not(:read-only){
-    color:#f00;
+    color:var(--warn);
 }
 .task .actions{
     margin: 5px;
@@ -137,7 +159,7 @@ input,button{
     color: #aaa;
 }
 .task .actions .delete{
-    color: #f00;
+    color: var(--warn);
 }
 
 .task.dragging{
@@ -149,21 +171,21 @@ input,button{
 
 #helpfulContainer{
     grid-area: right;
-    background-color: #3b3b3b;
+    background-color: var(--medDark);
     display: flex;
     flex-direction: column;
 }
 #helpfulContainer a{
-    background-color: #8f8f8f;
+    background-color: var(--light);
     padding: 10px;
     border-radius: 5px;
     text-align: center;
     margin: 5px 10px 5px 10px;
-    box-shadow: #222 4px 4px 2px 2px;
+    box-shadow: var(--shadow) 4px 4px 2px 2px;
 }
 #helpfulContainer a:hover{
     box-shadow: none;
-    background-color: #666;
+    background-color: var(--medLight);
     transform: scale(0.99);
 }
 #timeInputBox{
@@ -175,15 +197,15 @@ input,button{
 }
 #timeInput{
     width: 90px;
-    background-color: #333;
+    background-color: var(--medium);
     border-radius: 5px;
     padding: 5px;
-    box-shadow: #222 2px 2px;
+    box-shadow: var(--shadow) 2px 2px;
 }
 
 #footer{
     grid-area: footer;
-    background-color: #333;
+    background-color: var(--medium);
     display: flex;
     justify-content: center;
 }

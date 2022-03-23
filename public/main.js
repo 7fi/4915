@@ -276,7 +276,7 @@ function updateTime(){
     if(time < 600 & !hasCleanupAlerted & timeEntered == true){
         alert("Time to clean up!");
         hasCleanupAlerted = true;
-        timerContainer.style.backgroundColor = "#f00";
+        timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--warn');
     }
 }
 
@@ -284,7 +284,7 @@ function updateTime(){
 async function enterTime(inputTime){
     var today = new Date();
     let curTime = (today.getHours() * 60 * 60) + (today.getMinutes() * 60) + (today.getSeconds());
-    if(!inputTime){
+    if(inputTime == undefined){
         
         endTime = document.getElementById("timeInput").value;
         
@@ -311,23 +311,24 @@ async function enterTime(inputTime){
         const response = await fetch('/setTime', options);
         const json = await response.json();
         console.log(json);
+
     }else{
         endTime = inputTime;
     }
 
-    
-
     document.getElementById("timeInput").value = "";
 
-    timerContainer.style.backgroundColor = "#333";
+    timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
 
     time = endTime - curTime;  
-    time = Math.floor(time); 
+    time = Math.floor(time);
 
-    if(time < 1){
+    console.log(inputTime);
+
+    if(time < 1 && inputTime == undefined){
         alert("Time invalid (already passed)");
         time = 0;
-    }else{
+    }else if(inputTime == undefined){
         timeEntered = true;
         hasEndAlerted = false;
         hasCleanupAlerted = false;
