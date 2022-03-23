@@ -15,6 +15,7 @@ var Mtasks = [];
 
 var endTime;
 
+//Creating, moving, and deleting tasks
 app.post('/newTask', (request,response) => {
     var data = request.body;
     // console.log(request.rawHeaders);
@@ -76,7 +77,8 @@ app.post('/setTime', (request,response) => {
     })
 });
 
-app.get('/updatetasks', (request, response) => {
+// Update tasks, and time
+app.get('/updateTasks', (request, response) => {
     if(request.rawHeaders.join().includes('electronics')){
         response.json({
             status:"sucess",
@@ -85,14 +87,15 @@ app.get('/updatetasks', (request, response) => {
     }else if(request.rawHeaders.join().includes('mechanics')){
         response.json({
             status:"sucess",
-            tasks: Mtasks
+            tasks: Mtasks,
+            endTime: endTime
         })
     }
 });
 
-app.get('/getTime', (request, response) => {
-    response.json({
-        status:"sucess",
-        endTime: endTime
-    })
-});
+// app.get('/getTime', (request, response) => {
+//     response.json({
+//         status:"sucess",
+//         endTime: endTime
+//     })
+// });

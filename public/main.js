@@ -34,35 +34,33 @@ async function startup(){
     console.log(json);
 
     var tasksDifferent = false;
-    var children = listContainer.children;
-    if(children.length > 0){
-        for (let i = 0; i < json.tasks.length; i++) {
-            console.log(json.tasks[i]);
-            console.log(children[i].firstChild.firstChild.value);
-            if(json.tasks[i] != children[i].firstChild.firstChild.value){
-                tasksDifferent = true;
-                break;
+    if(listContainer){ // if this page even has tasks
+        var children = listContainer.children;
+        if(children.length > 0){
+            for (let i = 0; i < json.tasks.length; i++) {
+                console.log(json.tasks[i]);
+                console.log(children[i].firstChild.firstChild.value);
+                if(json.tasks[i] != children[i].firstChild.firstChild.value){
+                    tasksDifferent = true;
+                    break;
+                }
             }
+        }else{
+            tasksDifferent = true;
         }
-    }else{
-        tasksDifferent = true;
-    }
-    if(tasksDifferent){
-        while (listContainer.firstChild) {
-            listContainer.removeChild(listContainer.firstChild);
-        }
+        if(tasksDifferent){
+            while (listContainer.firstChild) {
+                listContainer.removeChild(listContainer.firstChild);
+            }
 
-        for (let i = 0; i < json.tasks.length; i++) {
-            const element = json.tasks[i];
-            createTask(element, false);
+            for (let i = 0; i < json.tasks.length; i++) {
+                const element = json.tasks[i];
+                createTask(element, false);
+            }
+        }else{
+            console.log("wasnt different");
         }
-    }else{
-        console.log("wasnt different");
     }
-
-    response = await fetch('/getTime');
-    json = await response.json();
-    console.log(json);
 
     if(json.endTime != endTime){
         // document.getElementById("timeInput").value = json.endTime;
@@ -99,22 +97,10 @@ if(form){
         
         if(afterElement == null){
             listContainer.appendChild(draggingEl);
-
-            // var temp = tasks[tasks.length - 1];
-            // tasks[tasks.length - 1] = tasks[tasks.indexOf(draggingEl.firstChild.firstChild.value)];
-            // tasks[tasks.indexOf(draggingEl.firstChild.firstChild.value)] = temp;
-            // [tasks[tasks.indexOf(draggingEl.textContent)], tasks[tasks[tasks.length - 1]]] = [[tasks[tasks.length - 1]], tasks[tasks.indexOf(draggingEl.textContent)]];
         } else{
             listContainer.insertBefore(draggingEl, afterElement);
-
-            // var temp = tasks[tasks.indexOf(afterElement.firstChild.firstChild.value)];
-            // tasks[tasks.indexOf(afterElement.firstChild.firstChild.value)] = tasks[tasks.indexOf(draggingEl.firstChild.firstChild.value)];
-            // tasks[tasks.indexOf(draggingEl.firstChild.firstChild.value)] = temp;
-
-            // [tasks[tasks.indexOf(draggingEl.textContent)], tasks[tasks.indexOf(afterElement.textContent)]] = [tasks[tasks.indexOf(afterElement.textContent)], tasks[tasks.indexOf(draggingEl.textContent)]];
         }
-        // console.log(draggingEl.firstChild.firstChild.value);
-        // console.log(tasks[tasks.indexOf(draggingEl.firstChild.firstChild.value)]);
+
     })
  
     //Gets the element after the one you are hovering on
