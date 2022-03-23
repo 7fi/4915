@@ -35,8 +35,12 @@ async function startup(){
     var children = listContainer.children;
     if(children.length > 0){
         for (let i = 0; i < json.tasks.length; i++) {
-            if(json.tasks[i] != children[i].firstChild.firstChild.value) isDifferent = true;
-            break;
+            // console.log(json.tasks[i]);
+            // console.log(children[i].firstChild.firstChild.value);
+            if(json.tasks[i] != children[i].firstChild.firstChild.value){
+                isDifferent = true;
+                break;
+            }
         }
     }else{
         isDifferent = true;
