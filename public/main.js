@@ -72,9 +72,29 @@ async function startup(){
 var source = new EventSource("../updates");
 source.onmessage = function(event) {
     var data = JSON.parse(event.data);
-    endTime = data;
-    enterTime(true);
+
+    if(data.target == "endTime"){
+        endTime = data;
+        enterTime(true);
+    }else if(data.target == "tasks"){
+        rebuild(data.data);
+    }
 };
+
+function rebuild(tasksList){
+    while (listContainer.firstChild) {
+        listContainer.removeChild(listContainer.firstChild);
+    }
+    tasks = [];
+
+    for (let i = 0; i < tasksList.length; i++) {
+        const children = listContainer.children;
+        const element = tasksList[i].task;
+        const curTask = {task: tasksList[i].task, assignedTo: tasksList[i].assignedTo};
+        tasks.push(curTask);
+        createTask(element, false);
+    }
+}
 
 
 //set timer to update every second
@@ -274,7 +294,14 @@ async function createTask(value, isNew){
             taskInputEl.setAttribute("readonly", "readonly");
             taskEditEl.innerText = "Edit";
             buildTasks();
-            var val = {index: tasks.indexOf(taskEl.firstChild.firstChild.value),value: taskEl.firstChild.firstChild.value};
+            var tempTasks = [];
+            for (let i = 0; i < tasks.length; i++) {
+                tempTasks[i] = tasks[i].task;
+            }
+            console.log(tasks, tempTasks);
+            var tempval = taskEl.firstChild.firstChild.value;
+            var val = {index: tempTasks.indexOf(tempval),value: tempval};
+            console.log(val);
             options = {method:"POST",headers:{"Content-Type":"application/json"},
                 body: JSON.stringify(val)
             };

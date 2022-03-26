@@ -2,7 +2,7 @@ const { response } = require('express');
 const express = require('express');
 const Datastore = require('nedb');
 const {google} = require('googleapis');
-// const keys = require('./keys.json');
+const keys = require('./keys.json');
 const sseMW = require('./sse');
 // var http = require('http');
 
@@ -26,20 +26,20 @@ var Ptasks = [];
 var endTime;
 
 var data = [];
-/* for local use 
+/* for local use */
 const client = new google.auth.JWT(
     keys.client_email, 
     null, 
     keys.private_key, 
     ['https://www.googleapis.com/auth/spreadsheets']
-);*/
-
-const client = new google.auth.JWT(
-    process.env.client_email, 
-    null, 
-    process.env.private_key, 
-    ['https://www.googleapis.com/auth/spreadsheets']
 );
+
+// const client = new google.auth.JWT(
+//     process.env.client_email, 
+//     null, 
+//     process.env.private_key, 
+//     ['https://www.googleapis.com/auth/spreadsheets']
+// );
 
 client.authorize(function(err,tokens){
     if(err){
@@ -96,42 +96,60 @@ app.post('/newTask', (request,response) => {
             status:"sucess",
             tasks: Etasks
         })
+        tasks = Etasks;
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks.push(newTask);
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
+        tasks = Mtasks;
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks.push(newTask);
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
+        tasks = Ptasks;
     }
+
+    sseClients.forEach(function (sseConnection) {
+        var data = {data:tasks, target: "tasks"};
+        sseConnection.send(data);
+    }, this);
 });
 
 app.post('/editTask', (request,response) => {
     var data = request.body;
+    var tasks;
     if(request.rawHeaders.join().includes('electronics')){
+        console.log("data index: " + data.index);
         Etasks[data.index].task = data.value;
         response.json({
             status:"sucess",
             tasks: Etasks
         })
+        tasks = Etasks;
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks[data.index].task = data.value;
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
+        tasks = Mtasks;
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks[data.index].task = data.value;
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
+        tasks = Ptasks;
     }
+
+    sseClients.forEach(function (sseConnection) {
+        var data = {data:tasks, target: "tasks"};
+        sseConnection.send(data);
+    }, this);
 });
 
 app.post('/delTask', (request,response) => {
@@ -142,19 +160,27 @@ app.post('/delTask', (request,response) => {
             status:"sucess",
             tasks: Etasks
         })
+        tasks = Etasks;
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
+        tasks = Mtasks;
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
+        tasks = Ptasks;
     }
+
+    sseClients.forEach(function (sseConnection) {
+        var data = {data:tasks, target: "tasks"};
+        sseConnection.send(data);
+    }, this);
 });
 
 app.post('/moveTask', (request,response) => {
