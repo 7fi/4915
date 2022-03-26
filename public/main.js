@@ -31,11 +31,11 @@ const listEl = document.getElementById("taskList");
 
 var thisPage;
 if(window.location.href.includes("electronics")){
-    thisPage == "electronics"
+    thisPage = "electronics";
 }else if(window.location.href.includes("mechanics")){
-    thisPage == "mechanics"
+    thisPage = "mechanics";
 }else if(window.location.href.includes("programming")){
-    thisPage == "programming"
+    thisPage = "programming";
 }
 
 startup();
@@ -82,10 +82,11 @@ async function startup(){
 var source = new EventSource("../updates");
 source.onmessage = function(event) {
     var data = JSON.parse(event.data);
-
+    console.log("RECIEVED UPDATE", data.page, thisPage, (data.page == thisPage))
     if(data.target == "endTime"){
         enterTime(data.data);
     }else if(data.target == "tasks" && data.page == thisPage){
+        console.log("Task working");
         rebuild(data.data);
     }
 };
@@ -99,9 +100,9 @@ function rebuild(tasksList){
     for (let i = 0; i < tasksList.length; i++) {
         const children = listContainer.children;
         const element = tasksList[i].task;
+        createTask(element, false, tasksList[i].assignedTo);
         const curTask = {task: tasksList[i].task, assignedTo: tasksList[i].assignedTo};
         tasks.push(curTask);
-        createTask(element, false, tasksList[i].assignedTo);
     }
 }
 

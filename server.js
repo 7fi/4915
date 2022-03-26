@@ -252,7 +252,7 @@ app.post('/changeAssign', (request,response) => {
         for (let i = 0; i < Mtasks.length; i++) {
             taskClone[i] = Mtasks.task;
         }
-        Mtasks[Mtasks.includes(data.parent)].assignedTo = data.value;
+        Mtasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Mtasks
@@ -263,7 +263,7 @@ app.post('/changeAssign', (request,response) => {
         for (let i = 0; i < Ptasks.length; i++) {
             taskClone[i] = Ptasks.task;
         }
-        Ptasks[Ptasks.indexOf(data.parent)].assignedTo = data.value;
+        Ptasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Ptasks
