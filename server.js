@@ -2,7 +2,7 @@ const { response } = require('express');
 const express = require('express');
 const Datastore = require('nedb');
 const {google} = require('googleapis');
-const keys = require('./keys.json');
+// const keys = require('./keys.json');
 const sseMW = require('./sse');
 // var http = require('http');
 
