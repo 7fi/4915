@@ -65,7 +65,7 @@ async function startup(){
     }
     
     // if(json.endTime != endTime){
-        enterTime(false, json.endTime);
+        enterTime(json.endTime);
     // }
 }
 
@@ -364,7 +364,7 @@ function updateTime(){
 }
 
 // Calculates and updates the current time
-async function enterTime(dontUpdate, inputTime){
+async function enterTime(inputTime){
     var today = new Date();
     let curTime = (today.getHours() * 60 * 60) + (today.getMinutes() * 60) + (today.getSeconds());
     if(inputTime == undefined){
@@ -394,7 +394,6 @@ async function enterTime(dontUpdate, inputTime){
             time += 12 * 3600;
             endTime += 12 * 3600;
         }
-        if(!dontUpdate){
             var val = {value: endTime};
             options = {method:"POST",headers:{"Content-Type":"application/json"},
                 body: JSON.stringify(val)
@@ -402,7 +401,6 @@ async function enterTime(dontUpdate, inputTime){
             const response = await fetch('/setTime', options);
             const json = await response.json();
             console.log(json);
-        }
         timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
     
     }else{
