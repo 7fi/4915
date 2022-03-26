@@ -141,13 +141,16 @@ input,button{
 .content .text{
     font-size: 30px;
     color:white;
-    width: fit-content;
+    cursor: default;
+    width: 100%;
 }
 .content .text:not(:read-only){
     color:var(--warn);
 }
 .task .actions{
     margin: 5px;
+    display: flex;
+    flex-direction: row;
 }
 .task .actions button{
     cursor: pointer;
@@ -156,7 +159,7 @@ input,button{
     font-weight: 700;
 }
 .task .actions .edit{
-    color: #aaa;
+    color:var(--light);
 }
 .task .actions .delete{
     color: var(--warn);
@@ -167,6 +170,29 @@ input,button{
 }
 .draggable{
     cursor: move;
+}
+.assignedTo{
+    cursor: pointer;
+    font-size:20px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color:var(--light);
+}
+.assignedTo::before{
+    content: "Assigned To: ";
+}
+.dropContainer{
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    background-color: #d6d6d6;
+    padding: 5px;
+}
+.assignedTo:hover .dropContainer{
+    display: flex;
+}
+.memberDrop:hover{
+    background-color: #00000033;
 }
 
 #helpfulContainer{

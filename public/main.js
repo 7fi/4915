@@ -10,6 +10,8 @@ var options = {};
 
 let endTime;
 
+let eMembers = ['Everyone','Carter', 'Maxine', 'Gavin'];
+
 //Timer elements
 const timerContainer = document.getElementById("timer");
 const timer = document.getElementById('timerNumbers');
@@ -25,11 +27,7 @@ const listEl = document.getElementById("taskList");
 // buildTasks();
 // console.log(taskEl.firstChild.firstChild.value);
 
-setInterval(startup, 2000);
-setInterval(syncTime, 10000);
-function syncTime(){
-    enterTime(endTime);
-}
+// setInterval(startup, 2000);
 
 startup();
 async function startup(){
@@ -40,12 +38,10 @@ async function startup(){
 
     var tasksDifferent = false;
     if(listContainer != null){ // if this page even has tasks
-        var children = listContainer.children;
+        /*var children = listContainer.children;
         if(children.length > 0){
             for (let i = 0; i < json.tasks.length; i++) {
-                // console.log(json.tasks[i]);
-                // console.log(children[i].firstChild.firstChild.value);
-                if(json.tasks[i] != children[i].firstChild.firstChild.value & children[i].children[1].firstChild.innerText != 'SAVE'){
+                if(json.tasks[i].task != children[i].firstChild.firstChild.value & children[i].children[1].firstChild.innerText != 'SAVE' & document.querySelector('.dragging') == undefined){
                     tasksDifferent = true;
                     break;
                 }
@@ -56,22 +52,30 @@ async function startup(){
         if(tasksDifferent){
             while (listContainer.firstChild) {
                 listContainer.removeChild(listContainer.firstChild);
-            }
+            }*/
 
             for (let i = 0; i < json.tasks.length; i++) {
-                const element = json.tasks[i];
+                const element = json.tasks[i].task;
                 createTask(element, false);
             }
-            console.log("was different or empty");
+            /*console.log("was different or empty");
         }else{
             console.log("wasnt different");
-        }
+        }*/
     }
-
+    /*
     if(json.endTime != endTime){
-        enterTime(json.endTime);
-    }
+        enterTime(false, json.endTime);
+    }*/
 }
+
+var source = new EventSource("../updates");
+source.onmessage = function(event) {
+    var data = JSON.parse(event.data);
+    endTime = data;
+    enterTime(true);
+};
+
 
 //set timer to update every second
 setInterval(updateTime, 1000);
@@ -114,7 +118,7 @@ if(form){
         
         return draggableEls.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height;
+            const offset = y - box.top - box.height / 2;
             
             if(offset < 0 && offset > closest.offset){
                 return{offset: offset, element:child};
@@ -137,9 +141,13 @@ function buildTasks(){
     const children = listContainer.children;
     tasks = [];
     for (let index = 0; index < children.length; index++) {
-        // console.log(children[index].firstChild.firstChild.value);
-        // console.log(tasks);
-        tasks.push(children[index].firstChild.firstChild.value);
+        var curNode = children[index].childNodes[1].firstChild
+        if(curNode.nodeType === Node.TEXT_NODE) { 
+            curNode.nodeValue.trim();
+            const curTask = {task: children[index].firstChild.firstChild.value, assignedTo: curNode.nodeValue};
+        }
+        const curTask = {task: children[index].firstChild.firstChild.value, assignedTo: children[index].childNodes[1].firstChild.textContent};
+        tasks.push(curTask);
     }
     
 }
@@ -173,6 +181,32 @@ async function createTask(value, isNew){
     const taskActionsEl = document.createElement("div");
     taskActionsEl.classList.add("actions");
 
+    //Create assign element
+    const assignedToEl = document.createElement("button");
+    assignedToEl.classList.add('assignedTo');
+    assignedToEl.innerHTML = 'Everyone';
+
+    const assignmentDropContainer = document.createElement('div');
+    assignmentDropContainer.classList.add('dropContainer');
+    for (let i = 0; i < eMembers.length; i++) {
+        const memberDropEl = document.createElement('button');
+        memberDropEl.classList.add('memberDrop');
+        memberDropEl.innerHTML = eMembers[i];
+        memberDropEl.addEventListener('click', async() => {
+            var val = {parent: memberDropEl.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.value ,value: memberDropEl.textContent};
+            options = {method:"POST",headers:{"Content-Type":"application/json"},
+                body: JSON.stringify(val)
+            };
+            const response = await fetch('/changeAssign', options);
+            const json = await response.json();
+            console.log(json);
+            memberDropEl.parentElement.parentElement.innerHTML = memberDropEl.innerHTML;
+        });
+        assignmentDropContainer.appendChild(memberDropEl);
+    }
+
+    assignedToEl.appendChild(assignmentDropContainer);
+
     //Create edit element
     const taskEditEl = document.createElement("button");
     taskEditEl.classList.add("edit");
@@ -184,16 +218,15 @@ async function createTask(value, isNew){
     taskDeleteEl.innerHTML = "X";
 
     // Add buttons to actions el and add that to the task
+    taskActionsEl.appendChild(assignedToEl);
     taskActionsEl.appendChild(taskEditEl);
     taskActionsEl.appendChild(taskDeleteEl);
 
     taskEl.appendChild(taskActionsEl);
     // add task to the list
     listEl.appendChild(taskEl);
-
+ 
     if(isNew){
-        // buildTasks();
-        // console.log(taskEl.firstChild.firstChild.value);
         var val = {value: taskEl.firstChild.firstChild.value};
         options = {method:"POST",headers:{"Content-Type":"application/json"},
             body: JSON.stringify(val)
@@ -222,6 +255,14 @@ async function createTask(value, isNew){
         const json = await response.json();
         console.log(json);
     })
+
+    assignedToEl.addEventListener('click', () => {
+        // if(assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'none'){
+        //     assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'flex';
+        // }else if(assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'flex'){
+        //     assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'none';
+        // }
+    });
 
     //Add event listener for edit button
     taskEditEl.addEventListener('click', async () => {
@@ -297,7 +338,7 @@ function updateTime(){
 }
 
 // Calculates and updates the current time
-async function enterTime(inputTime){
+async function enterTime(dontUpdate, inputTime){
     var today = new Date();
     let curTime = (today.getHours() * 60 * 60) + (today.getMinutes() * 60) + (today.getSeconds());
     if(inputTime == undefined){
@@ -319,31 +360,39 @@ async function enterTime(inputTime){
         
         console.log(endTime);
         endTime *= 3600;
-        
-        var val = {value: endTime};
-        options = {method:"POST",headers:{"Content-Type":"application/json"},
-            body: JSON.stringify(val)
-        };
-        const response = await fetch('/setTime', options);
-        const json = await response.json();
-        console.log(json);
+
+        time = endTime - curTime;  
+        time = Math.floor(time);
+
+        if(time < 1){
+            time += 12 * 3600;
+            endTime += 12 * 3600;
+        }
+        if(!dontUpdate){
+            var val = {value: endTime};
+            options = {method:"POST",headers:{"Content-Type":"application/json"},
+                body: JSON.stringify(val)
+            };
+            const response = await fetch('/setTime', options);
+            const json = await response.json();
+            console.log(json);
+        }
         timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
     
     }else{
         endTime = inputTime;
+
+        time = endTime - curTime;  
+        time = Math.floor(time);
     }
 
     document.getElementById("timeInput").value = "";
-
     
-    time = endTime - curTime;  
-    time = Math.floor(time);
-    
-    console.log(inputTime);
+    // console.log(inputTime);
     
     if(time < 1 && inputTime == undefined){
-        alert("Time invalid (already passed)");
-        time = 0;
+        // alert("Time invalid (already passed)");
+        time += 12 * 3600;
     }else if(time > 0){
         timeEntered = true;
         hasEndAlerted = false;

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <!-- <script src="main.js" defer></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <title>Spartronics Task Tracker</title>
+</head>
+<body id="body">
+    <div id="header">
+        <a id="title" href="index.html">Spartronics 4915 Scouting Data Visualisation</a>
+
+        <div id="navContainer">
+            <div id="navBar">
+                <a class="navLink" href="electronics.html">Mechanics</a>
+                <a class="navLink" href="electronics.html">Electronics</a>
+                <a class="navLink" href="programming.html">Programming</a>
+                <a class="navLink" href="electronics.html">Marketing</a>
+                <a class="navLink" href="electronics.html">Design</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="chartContainer">
+        <canvas id="chart" style="background-color: #fff;"></canvas>
+        <script>
+            var json;
+            fetchData();
+            async function fetchData(){
+                var val = {value: 'auto'};
+                options = {method:"POST",headers:{"Content-Type":"application/json"},
+                    body: JSON.stringify(val)
+                };
+                var response = await fetch('/getData',options);
+                auto = await response.json();
+                val = {value: 'teleop'};
+                var response = await fetch('/getData',options);
+                teleop = await response.json();
+
+                console.log(auto.scores,teleop.scores);
+
+                const config = {
+                type: 'bar',
+                data: {
+                    //labels: json.teams,
+                    datasets: [{
+                        label: '# of Auto Points',
+                        data: auto.scores,
+                        borderColor: '#f00',
+                        backgroundColor: '#300',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '# of Teleop Points',
+                        data: teleop.scores,
+                        borderColor: '#0f0',
+                        backgroundColor: '#080',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Chart.js Bar Chart - Stacked'
+                        },
+                    },
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            labels: auto.teams
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                }
+            };
+            const ctx = document.getElementById('chart');
+            const chart = new Chart(ctx, config
+            );
+            }
+
+            
+            /*
+            {
+                type: 'bar',
+                data: {
+                    labels: [4915,4911,948,4180],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }*/
+            
+        </script>
+    </div>
+    
+    <div id="footer">
+        <a id="footerText" href="https://github.com/7fi" target="_blank">Site by 7fi</a>
+    </div>
+
+</body>
+</html>
