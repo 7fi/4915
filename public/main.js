@@ -75,7 +75,7 @@ source.onmessage = function(event) {
 
     if(data.target == "endTime"){
         endTime = data.data;
-        enterTime();
+        enterTime(true);
     }else if(data.target == "tasks"){
         rebuild(data.data);
     }
