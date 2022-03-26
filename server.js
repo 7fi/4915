@@ -26,20 +26,20 @@ var Ptasks = [];
 var endTime;
 
 var data = [];
-/* for local use */
+/* for local use 
 const client = new google.auth.JWT(
     keys.client_email, 
     null, 
     keys.private_key, 
     ['https://www.googleapis.com/auth/spreadsheets']
-);
+);*/
 
-// const client = new google.auth.JWT(
-//     process.env.client_email, 
-//     null, 
-//     process.env.private_key, 
-//     ['https://www.googleapis.com/auth/spreadsheets']
-// );
+const client = new google.auth.JWT(
+    process.env.client_email, 
+    null, 
+    process.env.private_key, 
+    ['https://www.googleapis.com/auth/spreadsheets']
+);
 
 client.authorize(function(err,tokens){
     if(err){
