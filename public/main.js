@@ -40,7 +40,7 @@ if(window.location.href.includes("electronics")){
 
 setInterval(syncTime, 30000);
 function syncTime(){
-    enterTime();
+    enterTime(endTime);
 }
 
 startup();
