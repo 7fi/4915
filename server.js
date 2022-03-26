@@ -245,6 +245,7 @@ app.post('/changeAssign', (request,response) => {
             status:"sucess",
             tasks: Etasks
         })
+        tasks = Etasks;
         page = "electronics";
         console.log(Etasks);
     }else if(request.rawHeaders.join().includes('mechanics')){
@@ -257,6 +258,7 @@ app.post('/changeAssign', (request,response) => {
             status:"sucess",
             tasks: Mtasks
         })
+        tasks = Mtasks;
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         var taskClone = [];
@@ -268,6 +270,7 @@ app.post('/changeAssign', (request,response) => {
             status:"sucess",
             tasks: Ptasks
         })
+        tasks = Ptasks;
         page = "programming";
     }
     sseClients.forEach(function (sseConnection) {

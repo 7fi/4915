@@ -82,11 +82,9 @@ async function startup(){
 var source = new EventSource("../updates");
 source.onmessage = function(event) {
     var data = JSON.parse(event.data);
-    console.log("RECIEVED UPDATE", data.page, thisPage, (data.page == thisPage))
     if(data.target == "endTime"){
         enterTime(data.data);
     }else if(data.target == "tasks" && data.page == thisPage){
-        console.log("Task working");
         rebuild(data.data);
     }
 };
@@ -96,7 +94,7 @@ function rebuild(tasksList){
         listContainer.removeChild(listContainer.firstChild);
     }
     tasks = [];
-
+    console.log(tasksList);
     for (let i = 0; i < tasksList.length; i++) {
         const children = listContainer.children;
         const element = tasksList[i].task;
