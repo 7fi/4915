@@ -101,7 +101,7 @@ function rebuild(tasksList){
         const element = tasksList[i].task;
         const curTask = {task: tasksList[i].task, assignedTo: tasksList[i].assignedTo};
         tasks.push(curTask);
-        createTask(element, false);
+        createTask(element, false, tasksList[i].assignedTo);
     }
 }
 
