@@ -174,7 +174,7 @@ app.post('/delTask', (request,response) => {
         tasks = Etasks;
         page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
-        Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
+        Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)]);
         response.json({
             status:"sucess",
             tasks: Mtasks
@@ -182,7 +182,7 @@ app.post('/delTask', (request,response) => {
         tasks = Mtasks;
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
-        Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
+        Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)]);
         response.json({
             status:"sucess",
             tasks: Ptasks
