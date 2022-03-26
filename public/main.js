@@ -29,6 +29,15 @@ const listEl = document.getElementById("taskList");
 
 // setInterval(startup, 2000);
 
+var thisPage;
+if(window.location.href.includes("electronics")){
+    thisPage == "electronics"
+}else if(window.location.href.includes("mechanics")){
+    thisPage == "mechanics"
+}else if(window.location.href.includes("programming")){
+    thisPage == "programming"
+}
+
 startup();
 async function startup(){
     tasks = [];
@@ -75,7 +84,7 @@ source.onmessage = function(event) {
 
     if(data.target == "endTime"){
         enterTime(data.data);
-    }else if(data.target == "tasks"){
+    }else if(data.target == "tasks" && data.page == thisPage){
         rebuild(data.data);
     }
 };
