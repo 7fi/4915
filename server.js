@@ -90,6 +90,8 @@ app.get('/updates', function (req, res) {
 app.post('/newTask', (request,response) => {
     var data = request.body;
     const newTask = {task: data.value, assignedTo: "Everyone"};
+    var tasks;
+    var page;
     if(request.rawHeaders.join().includes('electronics')){
         Etasks.push(newTask);
         response.json({
@@ -97,6 +99,7 @@ app.post('/newTask', (request,response) => {
             tasks: Etasks
         })
         tasks = Etasks;
+        page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks.push(newTask);
         response.json({
@@ -104,6 +107,7 @@ app.post('/newTask', (request,response) => {
             tasks: Mtasks
         })
         tasks = Mtasks;
+        page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks.push(newTask);
         response.json({
@@ -111,10 +115,11 @@ app.post('/newTask', (request,response) => {
             tasks: Ptasks
         })
         tasks = Ptasks;
+        page = "programming";
     }
 
     sseClients.forEach(function (sseConnection) {
-        var data = {data:tasks, target: "tasks"};
+        var data = {data:tasks, target: "tasks", page: page};
         sseConnection.send(data);
     }, this);
 });
@@ -122,6 +127,7 @@ app.post('/newTask', (request,response) => {
 app.post('/editTask', (request,response) => {
     var data = request.body;
     var tasks;
+    var page; 
     if(request.rawHeaders.join().includes('electronics')){
         console.log("data index: " + data.index);
         Etasks[data.index].task = data.value;
@@ -130,6 +136,7 @@ app.post('/editTask', (request,response) => {
             tasks: Etasks
         })
         tasks = Etasks;
+        page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks[data.index].task = data.value;
         response.json({
@@ -137,6 +144,7 @@ app.post('/editTask', (request,response) => {
             tasks: Mtasks
         })
         tasks = Mtasks;
+        page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks[data.index].task = data.value;
         response.json({
@@ -144,16 +152,19 @@ app.post('/editTask', (request,response) => {
             tasks: Ptasks
         })
         tasks = Ptasks;
+        page = "programming";
     }
 
     sseClients.forEach(function (sseConnection) {
-        var data = {data:tasks, target: "tasks"};
+        var data = {data:tasks, target: "tasks", page:page};
         sseConnection.send(data);
     }, this);
 });
 
 app.post('/delTask', (request,response) => {
     var data = request.body;
+    var tasks;
+    var page;
     if(request.rawHeaders.join().includes('electronics')){
         Etasks.pop(Etasks[Etasks.includes(data.value)]);
         response.json({
@@ -161,6 +172,7 @@ app.post('/delTask', (request,response) => {
             tasks: Etasks
         })
         tasks = Etasks;
+        page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
         response.json({
@@ -168,6 +180,7 @@ app.post('/delTask', (request,response) => {
             tasks: Mtasks
         })
         tasks = Mtasks;
+        page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
         response.json({
@@ -175,64 +188,75 @@ app.post('/delTask', (request,response) => {
             tasks: Ptasks
         })
         tasks = Ptasks;
+        page = "programming";
     }
 
     sseClients.forEach(function (sseConnection) {
-        var data = {data:tasks, target: "tasks"};
+        var data = {data:tasks, target: "tasks", page: page};
         sseConnection.send(data);
     }, this);
 });
 
 app.post('/moveTask', (request,response) => {
     var data = request.body;
+    var tasks;
+    var page;
     if(request.rawHeaders.join().includes('electronics')){
         Etasks = data;
         response.json({
             status:"sucess",
             tasks: Etasks
         })
+        page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks = data;
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
+        page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         Ptasks = data;
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
+        page = "programming";
     }
     sseClients.forEach(function (sseConnection) {
-        var sendData = {data:data, target: "tasks"};
+        var sendData = {data:data, target: "tasks", page: page};
         sseConnection.send(sendData);
     }, this);
 });
 
 app.post('/changeAssign', (request,response) => {
     var data = request.body;
+    var tasks;
+    var page = "";
     if(request.rawHeaders.join().includes('electronics')){
         Etasks[Etasks.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Etasks
         })
+        page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
         Etasks[Etasks.includes(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
+        page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         Etasks[Etasks.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
+        page = "programming";
     }
     sseClients.forEach(function (sseConnection) {
-        var sendData = {data:tasks, target: "tasks"};
+        var sendData = {data:tasks, target: "tasks", page: page};
         sseConnection.send(sendData);
     }, this);
 });
@@ -298,18 +322,6 @@ app.get('/updateTasks', (request, response) => {
         })
     }
 });
-
-var m;
-updateSseClients = function (message) {
-    console.log("update all Sse Client with message " + message);
-    this.m = message;
-    sseClients.forEach(function (sseConnection) {
-        console.log("send sse message global m" + this.m);
-        sseConnection.send(this.m);
-    }
-        , this // this second argument to forEach is the thisArg (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) 
-    );
-}
 
 
 
