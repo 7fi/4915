@@ -234,21 +234,36 @@ app.post('/changeAssign', (request,response) => {
     var tasks;
     var page = "";
     if(request.rawHeaders.join().includes('electronics')){
-        Etasks[Etasks.indexOf(data.parent)].assignedTo = data.value;
+        var taskClone = [];
+        for (let i = 0; i < Etasks.length; i++) {
+            taskClone[i] = Etasks[i].task;
+        }
+        console.log(data.parent, taskClone);
+        console.log(taskClone.indexOf(data.parent));
+        Etasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Etasks
         })
         page = "electronics";
+        console.log(Etasks);
     }else if(request.rawHeaders.join().includes('mechanics')){
-        Etasks[Etasks.includes(data.parent)].assignedTo = data.value;
+        var taskClone = [];
+        for (let i = 0; i < Mtasks.length; i++) {
+            taskClone[i] = Mtasks.task;
+        }
+        Mtasks[Mtasks.includes(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
-        Etasks[Etasks.indexOf(data.parent)].assignedTo = data.value;
+        var taskClone = [];
+        for (let i = 0; i < Ptasks.length; i++) {
+            taskClone[i] = Ptasks.task;
+        }
+        Ptasks[Ptasks.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Ptasks

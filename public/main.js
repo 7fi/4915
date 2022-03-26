@@ -65,7 +65,8 @@ async function startup(){
 
             for (let i = 0; i < json.tasks.length; i++) {
                 const element = json.tasks[i].task;
-                createTask(element, false);
+                const assignment = json.tasks[i].assignedTo;
+                createTask(element, false, assignment);
             }
             /*console.log("was different or empty");
         }else{
@@ -180,7 +181,7 @@ function buildTasks(){
     
 }
 
-async function createTask(value, isNew){
+async function createTask(value, isNew, assignment){
     //Create Task div
     const taskEl = document.createElement("div");
     taskEl.classList.add("task");
@@ -212,7 +213,11 @@ async function createTask(value, isNew){
     //Create assign element
     const assignedToEl = document.createElement("button");
     assignedToEl.classList.add('assignedTo');
-    assignedToEl.innerHTML = 'Everyone';
+    if(assignment != null & assignment != undefined){
+        assignedToEl.innerHTML = assignment;
+    }else{
+        assignedToEl.innerHTML = 'Everyone';
+    }
 
     const assignmentDropContainer = document.createElement('div');
     assignmentDropContainer.classList.add('dropContainer');
@@ -396,28 +401,30 @@ async function enterTime(inputTime){
         console.log(endTime);
         endTime *= 3600;
 
-        time = endTime - curTime;  
-        time = Math.floor(time);
+        
 
-        if(time < 1){
-            time += 12 * 3600;
-            endTime += 12 * 3600;
-        }
-            var val = {value: endTime};
-            options = {method:"POST",headers:{"Content-Type":"application/json"},
-                body: JSON.stringify(val)
-            };
-            const response = await fetch('/setTime', options);
-            const json = await response.json();
-            console.log(json);
+        // if(time < 1){
+        //     time += 12 * 3600;
+        //     endTime += 12 * 3600;
+        // }
+
+        var val = {value: endTime};
+        options = {method:"POST",headers:{"Content-Type":"application/json"},
+            body: JSON.stringify(val)
+        };
+        const response = await fetch('/setTime', options);
+        const json = await response.json();
+        console.log(json);
+
         timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
     
     }else{
         endTime = inputTime;
 
-        time = endTime - curTime;  
-        time = Math.floor(time);
     }
+
+    time = endTime - curTime;  
+    time = Math.floor(time);
 
     document.getElementById("timeInput").value = "";
     
