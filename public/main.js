@@ -74,8 +74,7 @@ source.onmessage = function(event) {
     var data = JSON.parse(event.data);
 
     if(data.target == "endTime"){
-        endTime = data.data;
-        enterTime(true);
+        enterTime(data.data);
     }else if(data.target == "tasks"){
         rebuild(data.data);
     }
