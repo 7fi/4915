@@ -2,7 +2,7 @@ const { response } = require('express');
 const express = require('express');
 const Datastore = require('nedb');
 const {google} = require('googleapis');
-const keys = require('./keys.json');
+// const keys = require('./keys.json');
 const sseMW = require('./sse');
 // var http = require('http');
 
@@ -12,9 +12,9 @@ app.listen(port, () => console.log(`Starting server at ${port}`));
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
-const EtasksDB = new Datastore('Etasks.db');
-const MtasksDB = new Datastore('Etasks.db');
-const PtasksDB = new Datastore('Etasks.db');
+// const EtasksDB = new Datastore('Etasks.db');
+// const MtasksDB = new Datastore('Etasks.db');
+// const PtasksDB = new Datastore('Etasks.db');
 
 // EtasksDB.loadDatabase();
 // MtasksDB.loadDatabase();
@@ -26,11 +26,18 @@ var Ptasks = [];
 var endTime;
 
 var data = [];
-
+/* for local use 
 const client = new google.auth.JWT(
     keys.client_email, 
     null, 
     keys.private_key, 
+    ['https://www.googleapis.com/auth/spreadsheets']
+);*/
+
+const client = new google.auth.JWT(
+    process.env.client_email, 
+    null, 
+    process.env.private_key, 
     ['https://www.googleapis.com/auth/spreadsheets']
 );
 
