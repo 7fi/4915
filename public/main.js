@@ -63,10 +63,10 @@ async function startup(){
             console.log("wasnt different");
         }*/
     }
-    /*
-    if(json.endTime != endTime){
+    
+    // if(json.endTime != endTime){
         enterTime(false, json.endTime);
-    }*/
+    // }
 }
 
 var source = new EventSource("../updates");
@@ -74,7 +74,7 @@ source.onmessage = function(event) {
     var data = JSON.parse(event.data);
 
     if(data.target == "endTime"){
-        endTime = data;
+        endTime = data.data;
         enterTime(true);
     }else if(data.target == "tasks"){
         rebuild(data.data);
