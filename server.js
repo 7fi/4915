@@ -204,7 +204,12 @@ app.post('/moveTask', (request,response) => {
             tasks: Ptasks
         })
     }
+    sseClients.forEach(function (sseConnection) {
+        var sendData = {data:data, target: "tasks"};
+        sseConnection.send(sendData);
+    }, this);
 });
+
 app.post('/changeAssign', (request,response) => {
     var data = request.body;
     if(request.rawHeaders.join().includes('electronics')){
@@ -226,6 +231,10 @@ app.post('/changeAssign', (request,response) => {
             tasks: Ptasks
         })
     }
+    sseClients.forEach(function (sseConnection) {
+        var sendData = {data:tasks, target: "tasks"};
+        sseConnection.send(sendData);
+    }, this);
 });
 
 app.post('/setTime', (request,response) => {
@@ -236,7 +245,11 @@ app.post('/setTime', (request,response) => {
         status:"sucess",
         endTime: endTime
     })
-    updateSseClients(endTime);
+
+    sseClients.forEach(function (sseConnection) {
+        var sendData = {data:endTime, target: "endTime"};
+        sseConnection.send(sendData);
+    }, this);
 });
 
 app.post('/getData', async(request, response) => {
