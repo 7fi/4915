@@ -1,7 +1,7 @@
 const { response } = require('express');
 const express = require('express');
-const Datastore = require('nedb');
-const {google} = require('googleapis');
+// const Datastore = require('nedb');
+// const {google} = require('googleapis');
 // const keys = require('./keys.json');
 const sseMW = require('./sse');
 // var http = require('http');
@@ -34,7 +34,7 @@ const client = new google.auth.JWT(
     ['https://www.googleapis.com/auth/spreadsheets']
 );*/
 
-const client = new google.auth.JWT(
+/*const client = new google.auth.JWT(
     process.env.client_email, 
     null, 
     process.env.private_key, 
@@ -50,7 +50,7 @@ client.authorize(function(err,tokens){
         // teams = gsrun(client, "'Analysis'!U2:U35");
         // scores = gsrun(client, "'Analysis'!V2:V107");
     }
-});
+});*/
 
 async function gsrun(cl, range){
     const gsapi = google.sheets({version:'v4', auth: cl});
