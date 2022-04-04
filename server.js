@@ -185,7 +185,7 @@ app.post('/delTask', (request,response) => {
     var tasks;
     var page;
     if(request.rawHeaders.join().includes('electronics')){
-        Etasks.pop(Etasks[Etasks.includes(data.value)]);
+        // Etasks.pop(Etasks[Etasks.includes(data.value)]);
         db.remove({type: 'electronics', task: data.value}, {}, function (err, numRemoved) {});
         response.json({
             status:"sucess",
@@ -194,7 +194,7 @@ app.post('/delTask', (request,response) => {
         tasks = Etasks;
         page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
-        Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
+        // Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
         db.remove({type: 'mechanics', task: data.value}, {}, function (err, numRemoved) {});
         response.json({
             status:"sucess",
@@ -204,7 +204,7 @@ app.post('/delTask', (request,response) => {
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
         db.remove({type: 'programming', task: data.value}, {}, function (err, numRemoved) {});
-        Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
+        // Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
         response.json({
             status:"sucess",
             tasks: Ptasks

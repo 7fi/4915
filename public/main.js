@@ -39,6 +39,11 @@ if(window.location.href.includes("electronics")){
     thisPage = "programming";
 }
 
+setInterval(syncTime, 30000);
+function syncTime(){
+    enterTime(endTime);
+}
+
 startup();
 async function startup(){
     tasks = [];
