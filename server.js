@@ -1,6 +1,6 @@
 const { response } = require('express');
 const express = require('express');
-// const Datastore = require('nedb');
+const Datastore = require('nedb');
 // const {google} = require('googleapis');
 // const keys = require('./keys.json');
 const sseMW = require('./sse');
@@ -12,13 +12,18 @@ app.listen(port, () => console.log(`Starting server at ${port}`));
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
-// const EtasksDB = new Datastore('Etasks.db');
-// const MtasksDB = new Datastore('Etasks.db');
-// const PtasksDB = new Datastore('Etasks.db');
+const EtasksDB = new Datastore('Etasks.db');
+const MtasksDB = new Datastore('Mtasks.db');
+const PtasksDB = new Datastore('Ptasks.db');
 
-// EtasksDB.loadDatabase();
-// MtasksDB.loadDatabase();
-// PtasksDB.loadDatabase();
+const db = new Datastore('tasks.db');
+
+EtasksDB.loadDatabase();
+MtasksDB.loadDatabase();
+PtasksDB.loadDatabase();
+
+db.loadDatabase();
+
 var Etasks = [];
 var Mtasks = [];
 var Ptasks = [];
@@ -89,11 +94,17 @@ app.get('/updates', function (req, res) {
 //Creating, moving, and deleting tasks
 app.post('/newTask', (request,response) => {
     var data = request.body;
-    const newTask = {task: data.value, assignedTo: "Everyone"};
+    var newTask = {type: "",task: data.value, assignedTo: "Everyone"};
     var tasks;
     var page;
     if(request.rawHeaders.join().includes('electronics')){
-        Etasks.push(newTask);
+        newTask.type = 'electronics';
+        // EtasksDB.insert(newTask, function (err, newDocs){
+        //     Etasks = newDocs;
+        // });
+        db.insert(newTask, function (err, newDocs){
+            Etasks = newDocs;
+        });
         response.json({
             status:"sucess",
             tasks: Etasks
@@ -101,7 +112,10 @@ app.post('/newTask', (request,response) => {
         tasks = Etasks;
         page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
-        Mtasks.push(newTask);
+        newTask.type = 'mechanics';
+        db.insert(newTask, function (err, newDocs){
+            Mtasks = newDocs;
+        });
         response.json({
             status:"sucess",
             tasks: Mtasks
@@ -109,7 +123,10 @@ app.post('/newTask', (request,response) => {
         tasks = Mtasks;
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
-        Ptasks.push(newTask);
+        newTask.type = 'programming';
+        db.insert(newTask, function (err, newDocs){
+            Ptasks = newDocs;
+        });
         response.json({
             status:"sucess",
             tasks: Ptasks
@@ -129,8 +146,10 @@ app.post('/editTask', (request,response) => {
     var tasks;
     var page; 
     if(request.rawHeaders.join().includes('electronics')){
+        // EtasksDB.ensureIndex({ fieldName: 'index', unique: true });
         console.log("data index: " + data.index);
         Etasks[data.index].task = data.value;
+        db.update({type:"electronics", task: data.task }, { task: data.value}, {});
         response.json({
             status:"sucess",
             tasks: Etasks
@@ -167,6 +186,7 @@ app.post('/delTask', (request,response) => {
     var page;
     if(request.rawHeaders.join().includes('electronics')){
         Etasks.pop(Etasks[Etasks.includes(data.value)]);
+        db.remove({type: 'electronics', task: data.value}, {}, function (err, numRemoved) {});
         response.json({
             status:"sucess",
             tasks: Etasks
@@ -175,6 +195,7 @@ app.post('/delTask', (request,response) => {
         page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
         Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
+        db.remove({type: 'mechanics', task: data.value}, {}, function (err, numRemoved) {});
         response.json({
             status:"sucess",
             tasks: Mtasks
@@ -182,6 +203,7 @@ app.post('/delTask', (request,response) => {
         tasks = Mtasks;
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
+        db.remove({type: 'programming', task: data.value}, {}, function (err, numRemoved) {});
         Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
         response.json({
             status:"sucess",
@@ -202,6 +224,10 @@ app.post('/moveTask', (request,response) => {
     var tasks;
     var page;
     if(request.rawHeaders.join().includes('electronics')){
+        db.remove({type: 'electronics'}, { multi: true }, function (err, numRemoved) {});
+        for (let i = 0; i < data.length; i++) {
+            db.insert(data[i]);
+        }
         Etasks = data;
         response.json({
             status:"sucess",
@@ -209,6 +235,10 @@ app.post('/moveTask', (request,response) => {
         })
         page = "electronics";
     }else if(request.rawHeaders.join().includes('mechanics')){
+        db.remove({type: 'mechanics'}, { multi: true }, function (err, numRemoved) {});
+        for (let i = 0; i < data.length; i++) {
+            MtasksDB.insert(data[i]);
+        }
         Mtasks = data;
         response.json({
             status:"sucess",
@@ -216,6 +246,10 @@ app.post('/moveTask', (request,response) => {
         })
         page = "mechanics";
     }else if(request.rawHeaders.join().includes('programming')){
+        db.remove({type: 'programming'}, { multi: true }, function (err, numRemoved) {});
+        for (let i = 0; i < data.length; i++) {
+            PtasksDB.insert(data[i]);
+        }
         Ptasks = data;
         response.json({
             status:"sucess",
@@ -241,6 +275,8 @@ app.post('/changeAssign', (request,response) => {
         console.log(data.parent, taskClone);
         console.log(taskClone.indexOf(data.parent));
         Etasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
+
+        EtasksDB.update({task: data.parent},{ $set: { assignedTo: data.value } }, {});
         response.json({
             status:"sucess",
             tasks: Etasks
@@ -251,8 +287,9 @@ app.post('/changeAssign', (request,response) => {
     }else if(request.rawHeaders.join().includes('mechanics')){
         var taskClone = [];
         for (let i = 0; i < Mtasks.length; i++) {
-            taskClone[i] = Mtasks.task;
+            taskClone[i] = Mtasks[i].task;
         }
+        console.log(taskClone);
         Mtasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
@@ -263,14 +300,14 @@ app.post('/changeAssign', (request,response) => {
     }else if(request.rawHeaders.join().includes('programming')){
         var taskClone = [];
         for (let i = 0; i < Ptasks.length; i++) {
-            taskClone[i] = Ptasks.task;
+            taskClone[i] = Ptasks[i].task;
         }
         Ptasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
-        tasks = Ptasks;
+        tasks = Ptasks; 
         page = "programming";
     }
     sseClients.forEach(function (sseConnection) {
@@ -316,18 +353,28 @@ app.post('/getData', async(request, response) => {
 // Update tasks, and time
 app.get('/updateTasks', (request, response) => {
     if(request.rawHeaders.join().includes('electronics')){
+        db.find({type:'electronics'},function (err, docs){
+            Etasks = docs;
+        });
+        console.log(Etasks);
         response.json({
             status:"sucess",
             tasks: Etasks,
             endTime: endTime
         })
     }else if(request.rawHeaders.join().includes('mechanics')){
+        MtasksDB.find({},function (err, docs){
+            Mtasks = docs;
+        });
         response.json({
             status:"sucess",
             tasks: Mtasks,
             endTime: endTime
         })
     }else if(request.rawHeaders.join().includes('programming')){
+        PtasksDB.find({},function (err, docs){
+            Ptasks = docs;
+        });
         response.json({
             status:"sucess",
             tasks: Ptasks,

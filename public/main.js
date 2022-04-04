@@ -11,6 +11,7 @@ var options = {};
 let endTime;
 
 let eMembers = ['Everyone','Carter', 'Maxine', 'Gavin'];
+let mMembers = ['Everyone','Mitchel', 'Megan', 'Zephyr','Jake', 'Jiana', 'Lane', 'Zack','Pheonix'];
 
 //Timer elements
 const timerContainer = document.getElementById("timer");
@@ -99,7 +100,7 @@ function rebuild(tasksList){
         const children = listContainer.children;
         const element = tasksList[i].task;
         createTask(element, false, tasksList[i].assignedTo);
-        const curTask = {task: tasksList[i].task, assignedTo: tasksList[i].assignedTo};
+        const curTask = {type: thisPage, task: tasksList[i].task, assignedTo: tasksList[i].assignedTo};
         tasks.push(curTask);
     }
 }
@@ -169,15 +170,11 @@ function buildTasks(){
     const children = listContainer.children;
     tasks = [];
     for (let index = 0; index < children.length; index++) {
-        var curNode = children[index].childNodes[1].firstChild
-        if(curNode.nodeType === Node.TEXT_NODE) { 
-            curNode.nodeValue.trim();
-            const curTask = {task: children[index].firstChild.firstChild.value, assignedTo: curNode.nodeValue};
-        }
-        const curTask = {task: children[index].firstChild.firstChild.value, assignedTo: children[index].childNodes[1].firstChild.textContent};
+        var curNode = children[index].childNodes[1].firstChild.firstChild;
+        curNode.nodeValue.trim();
+        const curTask = {type: thisPage, task: children[index].firstChild.firstChild.value, assignedTo: curNode.nodeValue};
         tasks.push(curTask);
     }
-    
 }
 
 async function createTask(value, isNew, assignment){
@@ -220,10 +217,16 @@ async function createTask(value, isNew, assignment){
 
     const assignmentDropContainer = document.createElement('div');
     assignmentDropContainer.classList.add('dropContainer');
-    for (let i = 0; i < eMembers.length; i++) {
+    let memberList;
+    if(thisPage == 'electronics'){
+        memberList = eMembers;
+    } else if (thisPage == 'mechanics'){
+        memberList = mMembers;
+    }
+    for (let i = 0; i < memberList.length; i++) {
         const memberDropEl = document.createElement('button');
         memberDropEl.classList.add('memberDrop');
-        memberDropEl.innerHTML = eMembers[i];
+        memberDropEl.innerHTML = memberList[i];
         memberDropEl.addEventListener('click', async() => {
             var val = {parent: memberDropEl.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.value ,value: memberDropEl.textContent};
             options = {method:"POST",headers:{"Content-Type":"application/json"},
@@ -275,6 +278,7 @@ async function createTask(value, isNew, assignment){
     })
     taskEl.addEventListener('dragend', async () =>{
         taskEl.classList.remove('dragging');
+        console.log("dragend: ",tasks);
         buildTasks();
         options = {
             method:"POST",
