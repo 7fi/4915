@@ -334,16 +334,15 @@ async function createTask(value, isNew, assignment){
 
     //Add event listener for delete button
     taskDeleteEl.addEventListener('click', async () => {
-        tasks.splice(tasks.indexOf(taskInputEl.value),1);
-
-        var val = {value: taskEl.firstChild.firstChild.value};
+        var val = {value: taskEl.firstChild.firstChild.value, index: tasks.indexOf(taskInputEl.value)};
         options = {method:"POST",headers:{"Content-Type":"application/json"},
-            body: JSON.stringify(val)
+        body: JSON.stringify(val)
         };
         const response = await fetch('/delTask', options);
         const json = await response.json();
         console.log(json);
-
+    
+        tasks.splice(tasks.indexOf(taskInputEl.value),1);
     })
 }
 

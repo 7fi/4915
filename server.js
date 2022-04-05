@@ -147,48 +147,47 @@ app.post('/newTask', (request,response) => {
 app.post('/editTask', (request,response) => {
     var data = request.body;
     var tasks;
-    var page; 
     if(request.rawHeaders.join().includes('electronics')){
-        // EtasksDB.ensureIndex({ fieldName: 'index', unique: true });
-        console.log("data index: " + data.index);
-        Etasks[data.index].task = data.value;
-        db.update({type:"electronics", task: data.task }, { task: data.value}, {});
-        response.json({
-            status:"sucess",
-            tasks: Etasks
-        })
-        tasks = Etasks;
-        page = "electronics";
-    }else if(request.rawHeaders.join().includes('mechanics')){
-        Mtasks[data.index].task = data.value;
-        response.json({
-            status:"sucess",
-            tasks: Mtasks
-        })
-        tasks = Mtasks;
-        page = "mechanics";
-    }else if(request.rawHeaders.join().includes('programming')){
-        Ptasks[data.index].task = data.value;
-        response.json({
-            status:"sucess",
-            tasks: Ptasks
-        })
-        tasks = Ptasks;
-        page = "programming";
-    }
 
-    sseClients.forEach(function (sseConnection) {
-        var data = {data:tasks, target: "tasks", page:page};
-        sseConnection.send(data);
-    }, this);
+        db.update({type:"electronics", index: data.index}, {$set: { task: data.value }}, {});
+        db.find({type:'electronics'}).sort({index: 1}).exec(function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('electronics', docs);
+        });
+
+    }else if(request.rawHeaders.join().includes('mechanics')){
+        db.update({type:"mechanics", index: data.index}, {$set: { task: data.value }}, {});
+        db.find({type:'mechanics'}).sort({index: 1}).exec(function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('mechanics', docs);
+        });
+    }else if(request.rawHeaders.join().includes('programming')){
+        db.update({type:"programming", index: data.index}, {$set: { task: data.value }}, {});
+        db.find({type:'programming'}).sort({index: 1}).exec(function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('programming', docs);
+        });
+    }
 });
 
 app.post('/delTask', (request,response) => {
     var data = request.body;
-    var tasks;
-    var page;
     if(request.rawHeaders.join().includes('electronics')){
-        // Etasks.pop(Etasks[Etasks.includes(data.value)]);
+        db.find({type:'electronics'},function (err, docs){
+            for (let i = data.index + 1; i < docs.length; i++) {
+                db.update({type:"electronics", index: i}, {$set: { index: i - 1 }}, {});
+            }
+        });
+
         db.remove({type: 'electronics', task: data.value}, {});
         db.find({type:'electronics'},function (err, docs){
             response.json({
@@ -198,7 +197,11 @@ app.post('/delTask', (request,response) => {
             pushClientTasks('electronics', docs);
         });
     }else if(request.rawHeaders.join().includes('mechanics')){
-        // Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
+        db.find({type:'mechanics'},function (err, docs){
+            for (let i = data.index + 1; i < docs.length; i++) {
+                db.update({type:"mechanics", index: i}, {$set: { index: i - 1 }}, {});
+            }
+        });
         db.remove({type: 'mechanics', task: data.value}, {});
         db.find({type:'mechanics'},function (err, docs){
             response.json({
@@ -208,6 +211,11 @@ app.post('/delTask', (request,response) => {
             pushClientTasks('mechanics', docs);
         });
     }else if(request.rawHeaders.join().includes('programming')){
+        db.find({type:'programming'},function (err, docs){
+            for (let i = data.index + 1; i < docs.length; i++) {
+                db.update({type:"programming", index: i}, {$set: { index: i - 1 }}, {});
+            }
+        });
         db.remove({type: 'programming', task: data.value}, {});
         db.find({type:'programming'},function (err, docs){
             response.json({
@@ -263,7 +271,7 @@ app.post('/changeAssign', (request,response) => {
     var page = "";
     if(request.rawHeaders.join().includes('electronics')){
         db.update({type:'electronics', task: data.parent},{ $set: { assignedTo: data.value } }, {});
-        db.find({type:'electronics'},function (err, docs){
+        db.find({type:'electronics'}).sort({index: 1}).exec(function (err, docs){
             response.json({
                 status:"sucess",
                 tasks: docs
@@ -272,7 +280,7 @@ app.post('/changeAssign', (request,response) => {
         });
     }else if(request.rawHeaders.join().includes('mechanics')){
         db.update({type:'mechanics', task: data.parent},{ $set: { assignedTo: data.value } }, {});
-        db.find({type:'mechanics'},function (err, docs){
+        db.find({type:'mechanics'}).sort({index: 1}).exec(function (err, docs){
             response.json({
                 status:"sucess",
                 tasks: docs
@@ -281,7 +289,7 @@ app.post('/changeAssign', (request,response) => {
         });
     }else if(request.rawHeaders.join().includes('programming')){
         db.update({type:'programming', task: data.parent},{ $set: { assignedTo: data.value } }, {});
-        db.find({type:'programming'},function (err, docs){
+        db.find({type:'programming'}).sort({index: 1}).exec(function (err, docs){
             response.json({
                 status:"sucess",
                 tasks: docs
