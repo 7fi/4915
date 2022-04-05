@@ -253,14 +253,21 @@ input,button{
     #navContainer{
         width: 100%;
     }
+    #mainBody{
+        position: absolute;
+        grid-area: none;
+        top: 8%;
+    }
     #helpfulContainer{
         display:none;
     }
     #taskFormContainer{
         justify-content: center;
         width: 100%;
-        position: fixed;
-}
+        /* position: fixed; */
+    }
+    .assignedTo::before{
+        content: "For: ";
     }
     #timeInput{
         display: none;
