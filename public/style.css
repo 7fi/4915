@@ -55,6 +55,11 @@ a:visited{
     justify-content: center;
     margin: 10px;
 }
+#navBar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
 .navLink{
     font-weight: 600;
     margin:5px;
@@ -238,4 +243,35 @@ input,button{
 #footerText{
     /* text-align: center; */
     margin: 5px;
+}
+
+@media only screen and (max-width:1000px){
+    
+    #title{
+        display: none;
+    }
+    #navContainer{
+        width: 100%;
+    }
+    #helpfulContainer{
+        display:none;
+    }
+    #taskFormContainer{
+        justify-content: center;
+        width: 100%;
+        position: fixed;
+}
+    }
+    #timeInput{
+        display: none;
+    }
+    #footer{
+        display:none;
+    }
+    #timerContainer{
+        bottom: 0;
+    }
+    .navLink{
+        font-size: 1.2rem;
+    }
 }
