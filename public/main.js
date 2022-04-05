@@ -173,7 +173,7 @@ function buildTasks(){
     for (let index = 0; index < children.length; index++) {
         var curNode = children[index].childNodes[1].firstChild.firstChild;
         curNode.nodeValue.trim();
-        const curTask = {type: thisPage, task: children[index].firstChild.firstChild.value, assignedTo: curNode.nodeValue};
+        const curTask = {type: thisPage, task: children[index].firstChild.firstChild.value, assignedTo: curNode.nodeValue, index: index};
         tasks.push(curTask);
     }
 }

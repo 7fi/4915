@@ -106,7 +106,7 @@ app.post('/newTask', (request,response) => {
             newTask.index = docs.length;
         });
         db.insert(newTask);
-        db.find({type:'electronics'},function (err, docs){
+        db.find({type:'electronics'}).sort({index: 1}).exec(function (err, docs){
             response.json({
                 status:"sucess",
                 tasks: docs
@@ -116,11 +116,11 @@ app.post('/newTask', (request,response) => {
     }else if(request.rawHeaders.join().includes('mechanics')){
 
         newTask.type = 'mechanics';
-        db.find({type:'electronics'},function (err, docs){
+        db.find({type:'mechanics'},function (err, docs){
             newTask.index = docs.length;
         });
         db.insert(newTask);
-        db.find({type:'mechanics'},function (err, docs){
+        db.find({type:'mechanics'}).sort({index: 1}).exec(function (err, docs){
             response.json({
                 status:"sucess",
                 tasks: docs
@@ -130,11 +130,11 @@ app.post('/newTask', (request,response) => {
     }else if(request.rawHeaders.join().includes('programming')){
 
         newTask.type = 'programming';
-        db.find({type:'electronics'},function (err, docs){
+        db.find({type:'programming'},function (err, docs){
             newTask.index = docs.length;
         });
         db.insert(newTask);
-        db.find({type:'programming'},function (err, docs){
+        db.find({type:'programming'}).sort({index: 1}).exec(function (err, docs){
             response.json({
                 status:"sucess",
                 tasks: docs
@@ -331,7 +331,8 @@ app.post('/getData', async(request, response) => {
 // Update tasks, and time
 app.get('/updateTasks', (request, response) => {
     if(request.rawHeaders.join().includes('electronics')){
-        db.find({type:'electronics'},function (err, docs){
+        db.find({type:'electronics'}).sort({index: 1}).exec(function (err, docs){
+            console.log(docs);
             Etasks = docs;
         });
         db.find({type:'time'},function (err, docs){
@@ -347,7 +348,7 @@ app.get('/updateTasks', (request, response) => {
             })
         });
     }else if(request.rawHeaders.join().includes('mechanics')){
-        db.find({type:'mechanics'},function (err, docs){
+        db.find({type:'mechanics'}).sort({index: 1}).exec(function (err, docs){
             Mtasks = docs;
         });
         db.find({type:'time'},function (err, docs){
@@ -362,7 +363,7 @@ app.get('/updateTasks', (request, response) => {
             })
         });
     }else if(request.rawHeaders.join().includes('programming')){
-        db.find({type:'programming'},function (err, docs){
+        db.find({type:'programming'}).sort({index: 1}).exec(function (err, docs){
             Ptasks = docs;
         });
         db.find({type:'time'},function (err, docs){
