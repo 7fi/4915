@@ -18,11 +18,8 @@ const PtasksDB = new Datastore('Ptasks.db');
 
 const db = new Datastore('tasks.db');
 
-EtasksDB.loadDatabase();
-MtasksDB.loadDatabase();
-PtasksDB.loadDatabase();
-
 db.loadDatabase();
+// db.persistence.setAutocompactionInterval(30000);
 
 var Etasks = [];
 var Mtasks = [];
@@ -83,6 +80,13 @@ var sseClients = new sseMW.Topic();
 //configure sseMW.sseMiddleware as function to get a stab at incoming requests, in this case by adding a Connection property to the request
 app.use(sseMW.sseMiddleware)
 
+function pushClientTasks(page, tasks){
+    sseClients.forEach(function (sseConnection) {
+        var data = {data:tasks, target: "tasks", page: page};
+        sseConnection.send(data);
+    }, this);
+}
+
 app.get('/updates', function (req, res) {
     console.log("res (should have sseConnection)= " + res.sseConnection);
     var sseConnection = res.sseConnection;
@@ -94,51 +98,50 @@ app.get('/updates', function (req, res) {
 //Creating, moving, and deleting tasks
 app.post('/newTask', (request,response) => {
     var data = request.body;
-    var newTask = {type: "",task: data.value, assignedTo: "Everyone"};
-    var tasks;
-    var page;
+    var newTask = {type: "",task: data.value, assignedTo: "Everyone", index: 0};
     if(request.rawHeaders.join().includes('electronics')){
-        newTask.type = 'electronics';
-        // EtasksDB.insert(newTask, function (err, newDocs){
-        //     Etasks = newDocs;
-        // });
-        db.insert(newTask, function (err, newDocs){
-            Etasks = newDocs;
-        });
-        response.json({
-            status:"sucess",
-            tasks: Etasks
-        })
-        tasks = Etasks;
-        page = "electronics";
-    }else if(request.rawHeaders.join().includes('mechanics')){
-        newTask.type = 'mechanics';
-        db.insert(newTask, function (err, newDocs){
-            Mtasks = newDocs;
-        });
-        response.json({
-            status:"sucess",
-            tasks: Mtasks
-        })
-        tasks = Mtasks;
-        page = "mechanics";
-    }else if(request.rawHeaders.join().includes('programming')){
-        newTask.type = 'programming';
-        db.insert(newTask, function (err, newDocs){
-            Ptasks = newDocs;
-        });
-        response.json({
-            status:"sucess",
-            tasks: Ptasks
-        })
-        tasks = Ptasks;
-        page = "programming";
-    }
 
-    sseClients.forEach(function (sseConnection) {
-        var data = {data:tasks, target: "tasks", page: page};
-        sseConnection.send(data);
-    }, this);
+        newTask.type = 'electronics';
+        db.find({type:'electronics'},function (err, docs){
+            newTask.index = docs.length;
+        });
+        db.insert(newTask);
+        db.find({type:'electronics'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('electronics', docs);
+        });
+    }else if(request.rawHeaders.join().includes('mechanics')){
+
+        newTask.type = 'mechanics';
+        db.find({type:'electronics'},function (err, docs){
+            newTask.index = docs.length;
+        });
+        db.insert(newTask);
+        db.find({type:'mechanics'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('mechanics', docs);
+        });
+    }else if(request.rawHeaders.join().includes('programming')){
+
+        newTask.type = 'programming';
+        db.find({type:'electronics'},function (err, docs){
+            newTask.index = docs.length;
+        });
+        db.insert(newTask);
+        db.find({type:'programming'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('programming', docs);
+        });
+    }
 });
 
 app.post('/editTask', (request,response) => {
@@ -186,43 +189,38 @@ app.post('/delTask', (request,response) => {
     var page;
     if(request.rawHeaders.join().includes('electronics')){
         // Etasks.pop(Etasks[Etasks.includes(data.value)]);
-        db.remove({type: 'electronics', task: data.value}, {}, function (err, numRemoved) {});
-        response.json({
-            status:"sucess",
-            tasks: Etasks
-        })
-        tasks = Etasks;
-        page = "electronics";
+        db.remove({type: 'electronics', task: data.value}, {});
+        db.find({type:'electronics'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('electronics', docs);
+        });
     }else if(request.rawHeaders.join().includes('mechanics')){
         // Mtasks.pop(Mtasks[Mtasks.indexOf(data.value)].task);
-        db.remove({type: 'mechanics', task: data.value}, {}, function (err, numRemoved) {});
-        response.json({
-            status:"sucess",
-            tasks: Mtasks
-        })
-        tasks = Mtasks;
-        page = "mechanics";
+        db.remove({type: 'mechanics', task: data.value}, {});
+        db.find({type:'mechanics'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('mechanics', docs);
+        });
     }else if(request.rawHeaders.join().includes('programming')){
-        db.remove({type: 'programming', task: data.value}, {}, function (err, numRemoved) {});
-        // Ptasks.pop(Ptasks[Ptasks.indexOf(data.value)].task);
-        response.json({
-            status:"sucess",
-            tasks: Ptasks
-        })
-        tasks = Ptasks;
-        page = "programming";
+        db.remove({type: 'programming', task: data.value}, {});
+        db.find({type:'programming'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('programming', docs);
+        });
     }
-
-    sseClients.forEach(function (sseConnection) {
-        var data = {data:tasks, target: "tasks", page: page};
-        sseConnection.send(data);
-    }, this);
 });
 
 app.post('/moveTask', (request,response) => {
     var data = request.body;
-    var tasks;
-    var page;
     if(request.rawHeaders.join().includes('electronics')){
         db.remove({type: 'electronics'}, { multi: true }, function (err, numRemoved) {});
         for (let i = 0; i < data.length; i++) {
@@ -233,34 +231,30 @@ app.post('/moveTask', (request,response) => {
             status:"sucess",
             tasks: Etasks
         })
-        page = "electronics";
+        pushClientTasks('electronics', Etasks);
     }else if(request.rawHeaders.join().includes('mechanics')){
         db.remove({type: 'mechanics'}, { multi: true }, function (err, numRemoved) {});
         for (let i = 0; i < data.length; i++) {
-            MtasksDB.insert(data[i]);
+            db.insert(data[i]);
         }
         Mtasks = data;
         response.json({
             status:"sucess",
             tasks: Mtasks
         })
-        page = "mechanics";
+        pushClientTasks('mechanics', Mtasks);
     }else if(request.rawHeaders.join().includes('programming')){
         db.remove({type: 'programming'}, { multi: true }, function (err, numRemoved) {});
         for (let i = 0; i < data.length; i++) {
-            PtasksDB.insert(data[i]);
+            db.insert(data[i]);
         }
         Ptasks = data;
         response.json({
             status:"sucess",
             tasks: Ptasks
         })
-        page = "programming";
+        pushClientTasks('programming', Ptasks);
     }
-    sseClients.forEach(function (sseConnection) {
-        var sendData = {data:data, target: "tasks", page: page};
-        sseConnection.send(sendData);
-    }, this);
 });
 
 app.post('/changeAssign', (request,response) => {
@@ -268,62 +262,46 @@ app.post('/changeAssign', (request,response) => {
     var tasks;
     var page = "";
     if(request.rawHeaders.join().includes('electronics')){
-        var taskClone = [];
-        for (let i = 0; i < Etasks.length; i++) {
-            taskClone[i] = Etasks[i].task;
-        }
-        console.log(data.parent, taskClone);
-        console.log(taskClone.indexOf(data.parent));
-        Etasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
-
-        EtasksDB.update({task: data.parent},{ $set: { assignedTo: data.value } }, {});
-        response.json({
-            status:"sucess",
-            tasks: Etasks
-        })
-        tasks = Etasks;
-        page = "electronics";
-        console.log(Etasks);
+        db.update({type:'electronics', task: data.parent},{ $set: { assignedTo: data.value } }, {});
+        db.find({type:'electronics'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('electronics', docs);
+        });
     }else if(request.rawHeaders.join().includes('mechanics')){
-        var taskClone = [];
-        for (let i = 0; i < Mtasks.length; i++) {
-            taskClone[i] = Mtasks[i].task;
-        }
-        console.log(taskClone);
-        Mtasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
-        response.json({
-            status:"sucess",
-            tasks: Mtasks
-        })
-        tasks = Mtasks;
-        page = "mechanics";
+        db.update({type:'mechanics', task: data.parent},{ $set: { assignedTo: data.value } }, {});
+        db.find({type:'mechanics'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('mechanics', docs);
+        });
     }else if(request.rawHeaders.join().includes('programming')){
-        var taskClone = [];
-        for (let i = 0; i < Ptasks.length; i++) {
-            taskClone[i] = Ptasks[i].task;
-        }
-        Ptasks[taskClone.indexOf(data.parent)].assignedTo = data.value;
-        response.json({
-            status:"sucess",
-            tasks: Ptasks
-        })
-        tasks = Ptasks; 
-        page = "programming";
+        db.update({type:'programming', task: data.parent},{ $set: { assignedTo: data.value } }, {});
+        db.find({type:'programming'},function (err, docs){
+            response.json({
+                status:"sucess",
+                tasks: docs
+            })
+            pushClientTasks('programming', docs);
+        });
     }
-    sseClients.forEach(function (sseConnection) {
-        var sendData = {data:tasks, target: "tasks", page: page};
-        sseConnection.send(sendData);
-    }, this);
 });
 
 app.post('/setTime', (request,response) => {
-    console.log(endTime);
+    // console.log(endTime);
     endTime = request.body.value;
-    console.log("Set time to " + endTime);
-    response.json({
-        status:"sucess",
-        endTime: endTime
-    })
+    db.remove({type:'time'},{ multi: true });
+    db.insert({type:'time', endTime: endTime}, function(err, insertedDoc){
+        console.log("Set time to " + insertedDoc.endTime);
+        response.json({
+            status:"sucess",
+            endTime: endTime
+        })
+    });
 
     sseClients.forEach(function (sseConnection) {
         var sendData = {data:endTime, target: "endTime"};
@@ -356,30 +334,48 @@ app.get('/updateTasks', (request, response) => {
         db.find({type:'electronics'},function (err, docs){
             Etasks = docs;
         });
-        console.log(Etasks);
-        response.json({
-            status:"sucess",
-            tasks: Etasks,
-            endTime: endTime
-        })
+        db.find({type:'time'},function (err, docs){
+            console.log(docs)
+            var tempEndTime = undefined;
+            if(docs.length > 0){
+                tempEndTime = docs[0].endTime;
+            }
+            response.json({
+                status:"sucess",
+                tasks: Etasks,
+                endTime: tempEndTime
+            })
+        });
     }else if(request.rawHeaders.join().includes('mechanics')){
-        MtasksDB.find({},function (err, docs){
+        db.find({type:'mechanics'},function (err, docs){
             Mtasks = docs;
         });
-        response.json({
-            status:"sucess",
-            tasks: Mtasks,
-            endTime: endTime
-        })
+        db.find({type:'time'},function (err, docs){
+            var tempEndTime = undefined;
+            if(docs.length > 0){
+                tempEndTime = docs[0].endTime;
+            }
+            response.json({
+                status:"sucess",
+                tasks: Mtasks,
+                endTime: tempEndTime
+            })
+        });
     }else if(request.rawHeaders.join().includes('programming')){
-        PtasksDB.find({},function (err, docs){
+        db.find({type:'programming'},function (err, docs){
             Ptasks = docs;
         });
-        response.json({
-            status:"sucess",
-            tasks: Ptasks,
-            endTime: endTime
-        })
+        db.find({type:'time'},function (err, docs){
+            var tempEndTime = undefined;
+            if(docs.length > 0){
+                tempEndTime = docs[0].endTime;
+            }
+            response.json({
+                status:"sucess",
+                tasks: Ptasks,
+                endTime: tempEndTime
+            })
+        });
     }else{
         response.json({
             status:"sucess",

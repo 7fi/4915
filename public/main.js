@@ -12,6 +12,7 @@ let endTime;
 
 let eMembers = ['Everyone','Carter', 'Maxine', 'Gavin'];
 let mMembers = ['Everyone','Mitchel', 'Megan', 'Zephyr','Jake', 'Jiana', 'Lane', 'Zack','Pheonix'];
+let pMembers = ['Everyone','Noah', 'Henry', 'Claire','Troy'];
 
 //Timer elements
 const timerContainer = document.getElementById("timer");
@@ -80,9 +81,9 @@ async function startup(){
         }*/
     }
     
-    // if(json.endTime != endTime){
+    if(json.endTime != undefined){
         enterTime(json.endTime);
-    // }
+    }
 }
 
 var source = new EventSource("../updates");
@@ -118,18 +119,13 @@ if(form){
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        //Create task object: 
-        const task = {
-            value: input.value,
-            assignedTo: "",
-            dueDate: ""
-        }
+        const taskVal = input.value;
          
-        if(!(task.value)){
+        if(!taskVal){
             alert("Please fill in task");
             return;
         }
-        createTask(task.value, true);
+        createTask(taskVal, true);
     })
     // Event listener for which div is being hovered over while dragging
     listContainer.addEventListener('dragover', e => {
@@ -227,6 +223,8 @@ async function createTask(value, isNew, assignment){
         memberList = eMembers;
     } else if (thisPage == 'mechanics'){
         memberList = mMembers;
+    }else{
+        memberList = pMembers;
     }
     for (let i = 0; i < memberList.length; i++) {
         const memberDropEl = document.createElement('button');
@@ -266,6 +264,7 @@ async function createTask(value, isNew, assignment){
     // add task to the list
     listEl.appendChild(taskEl);
  
+    //Send to server
     if(isNew){
         var val = {value: taskEl.firstChild.firstChild.value};
         options = {method:"POST",headers:{"Content-Type":"application/json"},
@@ -273,7 +272,7 @@ async function createTask(value, isNew, assignment){
         };
         const response = await fetch('/newTask', options);
         const json = await response.json();
-        console.log(json);
+        console.log('newtask json: ', json);
     }
     input.value = ""; // reset input for next task
 
@@ -345,8 +344,6 @@ async function createTask(value, isNew, assignment){
         const json = await response.json();
         console.log(json);
 
-        listEl.removeChild(taskEl);
-        console.log(tasks);
     })
 }
 
@@ -389,6 +386,7 @@ function updateTime(){
 async function enterTime(inputTime){
     var today = new Date();
     let curTime = (today.getHours() * 60 * 60) + (today.getMinutes() * 60) + (today.getSeconds());
+    console.log("input time: ",inputTime);
     if(inputTime == undefined){
         
         endTime = document.getElementById("timeInput").value;
