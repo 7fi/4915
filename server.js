@@ -336,7 +336,7 @@ app.get('/updateTasks', (request, response) => {
         Task.find({type:'mechanics'}).sort({index: 1}).exec(function (err, docs){
             Mtasks = docs;
 
-            Task.find({type:'time'},async function (err, docs){
+            Time.find({type:'time'},async function (err, docs){
                 var tempEndTime = undefined;
                 if(docs.length > 0){
                     tempEndTime = await docs[0].endTime;
@@ -352,7 +352,7 @@ app.get('/updateTasks', (request, response) => {
     }else if(request.rawHeaders.join().includes('programming')){
         Task.find({type:'programming'}).sort({index: 1}).exec(function (err, docs){
             Ptasks = docs;
-            Task.find({type:'time'},async function (err, docs){
+            Time.find({type:'time'},async function (err, docs){
                 var tempEndTime = undefined;
                 if(docs.length > 0){
                     tempEndTime = await docs[0].endTime;
