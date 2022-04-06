@@ -101,7 +101,7 @@ function rebuild(tasksList){
         listContainer.removeChild(listContainer.firstChild);
     }
     tasks = [];
-    console.log(tasksList);
+    // console.log(tasksList);
     for (let i = 0; i < tasksList.length; i++) {
         const children = listContainer.children;
         const element = tasksList[i].task;
@@ -198,7 +198,7 @@ async function createTask(value, isNew, assignment){
     taskInputEl.type = "text";
     taskInputEl.value = value;
     tasks.push(taskInputEl.value);
-    console.log(tasks);
+    // console.log(tasks);
     taskInputEl.setAttribute("readonly", "readonly");
 
     taskContentEl.appendChild(taskInputEl);
@@ -335,7 +335,7 @@ async function createTask(value, isNew, assignment){
     //Add event listener for delete button
     taskDeleteEl.addEventListener('click', async () => {
         var val = {value: taskEl.firstChild.firstChild.value, index: tasks.indexOf(taskInputEl.value)};
-        options = {method:"POST",headers:{"Content-Type":"application/json"},
+        options = {method:"DELETE",headers:{"Content-Type":"application/json"},
         body: JSON.stringify(val)
         };
         const response = await fetch('/delTask', options);
