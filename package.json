@@ -17,9 +17,7 @@
   "author": "Carter Anderson",
   "license": "MIT",
   "dependencies": {
-    "chart.js": "^3.7.1",
     "express": "^4.17.3",
-    "googleapis": "^30.0.0",
-    "nedb": "^1.8.0"
+    "mongoose": "^6.2.10"
   }
 }
