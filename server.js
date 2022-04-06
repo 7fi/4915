@@ -366,10 +366,16 @@ app.get('/updateTasks', (request, response) => {
         });
        
     }else{
-        response.json({
-            status:"sucess",
-            endTime: endTime
-        })
+        Time.find({type:'time'},async function (err, docs){
+            var tempEndTime = undefined;
+            if(docs.length > 0){
+                tempEndTime = await docs[0].endTime;
+            }
+            response.json({
+                status:"sucess",
+                endTime: tempEndTime
+            })
+        });
     }
 });
 
