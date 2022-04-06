@@ -15,7 +15,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 //process.env.DATABASE_URL mongodb://localhost/tasks
-mongoose.connect('process.env.DATABASE_URL', {useNewUrlParser:true});
+mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser:true});
 const db = mongoose.connection;
 db.once('open', () => app.listen(port, () => console.log(`Starting server at ${port}`)));
 db.on('error', (error) => console.log(error));
