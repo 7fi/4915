@@ -1,33 +1,62 @@
-const { response } = require('express');
+require('dotenv').config();
 const express = require('express');
-const Datastore = require('nedb');
+// const Datastore = require('nedb');
+// const mongoose = require('mongoose'); 
+const MongoClient = require("mongodb").MongoClient;
+const sseMW = require('./sse');
 // const {google} = require('googleapis');
 // const keys = require('./keys.json');
-const sseMW = require('./sse');
 // var http = require('http');
 
+//process.env.DATABASE_URL mongodb://localhost/tasks
+// mongoose.connect('mongodb+srv://7fi:Mrspyman1@7devcluster.zh7gg.mongodb.net/7dev-taskManager?retryWrites=true&w=majority', {useNewUrlParser:true});
+// const db = mongoose.connection;
+// db.once('open', () => console.log("Connceted to DB"));
+// db.on('error', (error) => console.log(error));
+// const tasksRouter = require('./routes/tasks');
+
+
+
+const client = new MongoClient('mongodb+srv://7fi:Mrspyman1@7devcluster.zh7gg.mongodb.net/7dev-taskManager?retryWrites=true&w=majority');
+client.connect();
+const database = client.db('7dev-taskManager');
+const db = database.collection('tasks');
+
+async function run() {
+  try {
+    await client.connect();
+    // const database = client.db('7dev-taskManager');
+    // const db = database.collection('tasks');
+    // Query for a movie that has the title 'Back to the Future'
+    // const query = { title: 'Back to the Future' };
+    // const movie = await movies.findOne(query);
+    // console.log(movie);
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+// run().catch(console.dir);
+
 const app = express();
+// app.use('/tasks', tasksRouter);
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Starting server at ${port}`));
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
-const EtasksDB = new Datastore('Etasks.db');
-const MtasksDB = new Datastore('Mtasks.db');
-const PtasksDB = new Datastore('Ptasks.db');
+// const db = new Datastore('tasks.db');
 
-const db = new Datastore('tasks.db');
-
-db.loadDatabase();
+// db.loadDatabase();
 // db.persistence.setAutocompactionInterval(30000);
 
-var Etasks = [];
+var Etasks = [];    
 var Mtasks = [];
 var Ptasks = [];
 
 var endTime;
 
-var data = [];
 /* for local use 
 const client = new google.auth.JWT(
     keys.client_email, 

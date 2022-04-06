@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "devStart": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,10 @@
     "chart.js": "^3.7.1",
     "express": "^4.17.3",
     "googleapis": "^30.0.0",
+    "mongoose": "^6.2.10",
     "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0"
   }
 }
