@@ -10,9 +10,9 @@ var options = {};
 
 let endTime;
 
-let eMembers = ['Everyone','Carter', 'Maxine', 'Gavin'];
-let mMembers = ['Everyone','Mitchel', 'Megan', 'Zephyr','Jake', 'Jiana', 'Lane', 'Zack','Pheonix'];
-let pMembers = ['Everyone','Noah', 'Henry', 'Claire','Troy'];
+let eMembers = ['Everyone','Carter', 'Maxine', 'Gavin','Mentors'];
+let mMembers = ['Everyone','Mitchel', 'Megan', 'Zephyr','Jake', 'Jiana', 'Lane', 'Zack','Pheonix','Mentors'];
+let pMembers = ['Everyone','Noah','Henry','Camden', 'Claire', 'Troy', 'Evan','Mentors'];
 
 //Timer elements
 const timerContainer = document.getElementById("timer");
@@ -24,6 +24,7 @@ const listContainer = document.querySelector("#taskList");
 const form = document.getElementById("taskForm");
 const input = document.getElementById("taskInput");
 const listEl = document.getElementById("taskList");
+const loadingEl = document.getElementById("loadingEl");
 // console.log(form);
 
 // buildTasks();
@@ -38,6 +39,10 @@ if(window.location.href.includes("electronics")){
     thisPage = "mechanics";
 }else if(window.location.href.includes("programming")){
     thisPage = "programming";
+}else if(window.location.href.includes("team")){
+    thisPage = "team";
+}else{
+    thisPage = "other";
 }
 
 setInterval(syncTime, 30000);
@@ -48,8 +53,10 @@ function syncTime(){
 startup();
 async function startup(){
     tasks = [];
+    loadingEl.style.display ='block';
     var response = await fetch('/updateTasks');
     var json = await response.json();
+    loadingEl.style.display = 'none';
     console.log(json);
 
     var tasksDifferent = false;
@@ -69,7 +76,7 @@ async function startup(){
             while (listContainer.firstChild) {
                 listContainer.removeChild(listContainer.firstChild);
             }*/
-
+            console.log(json.tasks);
             for (let i = 0; i < json.tasks.length; i++) {
                 const element = json.tasks[i].task;
                 const assignment = json.tasks[i].assignedTo;
@@ -223,8 +230,10 @@ async function createTask(value, isNew, assignment){
         memberList = eMembers;
     } else if (thisPage == 'mechanics'){
         memberList = mMembers;
-    }else{
+    }else if(thisPage == 'programming'){
         memberList = pMembers;
+    }else if(thisPage == 'team'){
+        memberList = ["Everyone","Captains","Leadership","Drive Team","Mentors"];
     }
     for (let i = 0; i < memberList.length; i++) {
         const memberDropEl = document.createElement('button');
@@ -235,8 +244,10 @@ async function createTask(value, isNew, assignment){
             options = {method:"POST",headers:{"Content-Type":"application/json"},
                 body: JSON.stringify(val)
             };
+            loadingEl.style.display ='block';
             const response = await fetch('/changeAssign', options);
             const json = await response.json();
+            loadingEl.style.display ='none';
             console.log(json);
             memberDropEl.parentElement.parentElement.innerHTML = memberDropEl.innerHTML;
         });
@@ -270,9 +281,12 @@ async function createTask(value, isNew, assignment){
         options = {method:"POST",headers:{"Content-Type":"application/json"},
             body: JSON.stringify(val)
         };
+        loadingEl.style.display = 'block';
         const response = await fetch('/newTask', options);
-        const json = await response.json();
-        console.log('newtask json: ', json);
+        // const json = await response.json();
+        // console.log('newtask json: ', json);
+        // console.log("changine loading element to off");
+        loadingEl.style.display = 'none';
     }
     input.value = ""; // reset input for next task
 
@@ -291,8 +305,10 @@ async function createTask(value, isNew, assignment){
             },
             body: JSON.stringify(tasks)
         };
+        loadingEl.style.display ='block';
         const response = await fetch('/moveTask', options);
         const json = await response.json();
+        loadingEl.style.display ='none';
         console.log(json);
     })
 
@@ -325,8 +341,10 @@ async function createTask(value, isNew, assignment){
             options = {method:"POST",headers:{"Content-Type":"application/json"},
                 body: JSON.stringify(val)
             };
+            loadingEl.style.display ='block';
             const response = await fetch('/editTask', options);
             const json = await response.json();
+            loadingEl.style.display ='none';
             console.log(json);
             // console.log(tasks);
         }
@@ -338,8 +356,10 @@ async function createTask(value, isNew, assignment){
         options = {method:"DELETE",headers:{"Content-Type":"application/json"},
         body: JSON.stringify(val)
         };
+        loadingEl.style.display ='block';
         const response = await fetch('/delTask', options);
         const json = await response.json();
+        loadingEl.style.display ='none';
         console.log(json);
     
         tasks.splice(tasks.indexOf(taskInputEl.value),1);
@@ -417,8 +437,10 @@ async function enterTime(inputTime){
         options = {method:"POST",headers:{"Content-Type":"application/json"},
             body: JSON.stringify(val)
         };
+        loadingEl.style.display ='block';
         const response = await fetch('/setTime', options);
         const json = await response.json();
+        loadingEl.style.display ='none';
         console.log(json);
 
         timerContainer.style.backgroundColor = document.documentElement.style.getPropertyValue('--medium');
