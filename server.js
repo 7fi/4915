@@ -1,11 +1,8 @@
-// require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose'); 
 const sseMW = require('./sse');
-// const Datastore = require('nedb');
-// const {google} = require('googleapis');
 // const keys = require('./keys.json');
-// var http = require('http');
+
 
 const Task = require('./models/task');
 const Time = require('./models/time');
@@ -14,28 +11,14 @@ const app = express();
 
 const port = process.env.PORT || 3000;
 
-//process.env.DATABASE_URL mongodb://localhost/tasks
+//process.env.DATABASE_URL || keys.DATABASE_URL
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser:true});
 const db = mongoose.connection;
 db.once('open', () => app.listen(port, () => console.log(`Starting server at ${port}`)));
 db.on('error', (error) => console.log(error));
 
-// const tasksRouter = require('./routes/tasks');
-// app.use('/tasks', tasksRouter);
-
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
-
-// const db = new Datastore('tasks.db');
-
-// db.loadDatabase();
-// db.persistence.setAutocompactionInterval(30000);
-
-var Etasks = [];    
-var Mtasks = [];
-var Ptasks = [];
-
-var endTime;
 
 // Realtime updates
 var sseClients = new sseMW.Topic();
@@ -53,7 +36,6 @@ function pushClientTasks(page, tasks){
 app.get('/updates', function (req, res) {
     // console.log("res (should have sseConnection)= " + res.sseConnection);
     var sseConnection = res.sseConnection;
-    // console.log("sseConnection= ");
     sseConnection.setup();
     sseClients.add(sseConnection);
 });
@@ -210,19 +192,20 @@ app.delete('/delTask', (request,response) => {
 
 app.post('/moveTask', (request,response) => {
     var data = request.body;
+    var tasks;
     if(request.rawHeaders.join().includes('electronics')){
         Task.remove({type: 'electronics'}, { multi: true }, async function (err, numRemoved) {
             for (let i = 0; i < data.length; i++) {
                 const tempTask = new Task(data[i]);
                 await tempTask.save();
             }
-            Etasks = data;
+            tasks = data;
             response.json({
                 status:"sucess",
-                tasks: Etasks
+                tasks: tasks
             }).status(200);
 
-            pushClientTasks('electronics', Etasks);
+            pushClientTasks('electronics', tasks);
         });
        
     }else if(request.rawHeaders.join().includes('mechanics')){
@@ -231,12 +214,12 @@ app.post('/moveTask', (request,response) => {
                 const tempTask = new Task(data[i]);
                 await tempTask.save();
             }
-            Mtasks = data;
+            tasks = data;
             response.json({
                 status:"sucess",
-                tasks: Mtasks
+                tasks: tasks
             }).status(200);
-            pushClientTasks('mechanics', Mtasks);
+            pushClientTasks('mechanics', tasks);
         });
         
     }else if(request.rawHeaders.join().includes('programming')){
@@ -245,12 +228,12 @@ app.post('/moveTask', (request,response) => {
                 const tempTask = new Task(data[i]);
                 await tempTask.save();
             }
-            Ptasks = data;
+            tasks = data;
             response.json({
                 status:"sucess",
-                tasks: Ptasks
+                tasks: tasks
             })
-            pushClientTasks('programming', Ptasks);
+            pushClientTasks('programming', tasks);
         });
     }
 });
@@ -294,7 +277,7 @@ app.post('/changeAssign', (request,response) => {
 });
 
 app.post('/setTime', async (request,response) => {
-    endTime = request.body.value;
+    var endTime = request.body.value;
     await Time.deleteMany({type:'time'},{ multi: true });
 
     const tempTime = new Time({type:'time', endTime: endTime});
@@ -313,10 +296,11 @@ app.post('/setTime', async (request,response) => {
 
 // Update tasks, and time
 app.get('/updateTasks', (request, response) => {
+    var tasks;
     if(request.rawHeaders.join().includes('electronics')){
         Task.find({type:'electronics'}).sort({index: 1}).exec(function (err, docs){
             console.log(docs);
-            Etasks = docs;
+            tasks = docs;
 
             Time.find({type:'time'},async function (err, docs){
                 console.log(docs)
@@ -326,7 +310,7 @@ app.get('/updateTasks', (request, response) => {
                 }
                 response.json({
                     status:"sucess",
-                    tasks: Etasks,
+                    tasks: tasks,
                     endTime: tempEndTime
                 }).status(200);
             });
@@ -334,7 +318,7 @@ app.get('/updateTasks', (request, response) => {
         
     }else if(request.rawHeaders.join().includes('mechanics')){
         Task.find({type:'mechanics'}).sort({index: 1}).exec(function (err, docs){
-            Mtasks = docs;
+            tasks = docs;
 
             Time.find({type:'time'},async function (err, docs){
                 var tempEndTime = undefined;
@@ -343,7 +327,7 @@ app.get('/updateTasks', (request, response) => {
                 }
                 response.json({
                     status:"sucess",
-                    tasks: Mtasks,
+                    tasks: tasks,
                     endTime: tempEndTime
                 })
             });
@@ -351,7 +335,7 @@ app.get('/updateTasks', (request, response) => {
         
     }else if(request.rawHeaders.join().includes('programming')){
         Task.find({type:'programming'}).sort({index: 1}).exec(function (err, docs){
-            Ptasks = docs;
+            tasks = docs;
             Time.find({type:'time'},async function (err, docs){
                 var tempEndTime = undefined;
                 if(docs.length > 0){
@@ -359,7 +343,7 @@ app.get('/updateTasks', (request, response) => {
                 }
                 response.json({
                     status:"sucess",
-                    tasks: Ptasks,
+                    tasks: tasks,
                     endTime: tempEndTime
                 })
             });
@@ -378,12 +362,3 @@ app.get('/updateTasks', (request, response) => {
         });
     }
 });
-
-
-
-// app.get('/getTime', (request, response) => {
-//     response.json({
-//         status:"sucess",
-//         endTime: endTime
-//     })
-// });
