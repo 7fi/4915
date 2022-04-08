@@ -135,7 +135,7 @@ if(form){
         createTask(taskVal, true);
     })
     // Event listener for which div is being hovered over while dragging
-    listContainer.addEventListene('dragover', e => {
+    listContainer.addEventListener('dragover', e => {
         e.preventDefault();
         
         const afterElement = getDragAfterElement(e.clientY);
