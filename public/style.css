@@ -68,7 +68,7 @@ a:visited{
 }
 
 #title{
-    font-size: 50px;
+    font-size: 2rem;
     margin: 10px;
     cursor:default;
 }
@@ -284,6 +284,76 @@ input,button{
 #footerText{
     /* text-align: center; */
     margin: 5px;
+}
+
+.scoutingSection{
+    display:flex;
+    flex-direction:column;
+    overflow-y: auto;
+    width: 100%;
+    top: 8%;
+    bottom: 3%;
+    position:absolute;
+}
+
+.scoutingDatapoint{
+    height: 50px!important;
+    background: var(--dark);
+    margin:10px;
+    display:flex;
+    flex-direction:row;
+    border-radius: 10px;
+    color: var(--highlight);
+    justify-content: space-between;
+    
+}
+.scoutingDataQuestion{
+    margin: 14px;
+}
+.scoutingButtonHolder{
+    float:right;
+    /* margin:5px; */
+    display:flex;
+}
+.scoutingButton{
+    color:var(--highlight);
+    font-weight: 700;
+    background-color: var(--medLight);
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    margin:5px;
+}
+.scoutingButton:hover{
+    background-color: var(--light);
+    transform: scale(0.9);
+}
+.scoutingInput{
+    flex-grow:1;
+    color:var(--highlight);
+    background-color: var(--medLight);
+    margin: 5px;
+    border-radius: 10px;
+    padding: 5px;
+}
+::placeholder{
+    color:var(--light);
+}
+#scoutingSubmitButton{
+    /* left:50%; */
+    bottom:0;
+    /* margin:10px; */
+    background-color: var(--dark);
+    color:var(--highlight);
+    height: 40px!important;
+    width: 100%;
+    border-radius: 5px;
+    cursor:grab;
+    
+    /* position:absolute;   */
+}
+.scoutingDisplayCount{
+    margin:16px;
 }
 
 @media only screen and (max-width:1000px){

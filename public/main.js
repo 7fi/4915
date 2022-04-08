@@ -135,7 +135,7 @@ if(form){
         createTask(taskVal, true);
     })
     // Event listener for which div is being hovered over while dragging
-    listContainer.addEventListener('dragover', e => {
+    listContainer.addEventListene('dragover', e => {
         e.preventDefault();
         
         const afterElement = getDragAfterElement(e.clientY);
@@ -311,14 +311,6 @@ async function createTask(value, isNew, assignment){
         loadingEl.style.display ='none';
         console.log(json);
     })
-
-    assignedToEl.addEventListener('click', () => {
-        // if(assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'none'){
-        //     assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'flex';
-        // }else if(assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'flex'){
-        //     assignedToEl.getElementsByClassName('dropContainer')[0].style.display = 'none';
-        // }
-    });
 
     //Add event listener for edit button
     taskEditEl.addEventListener('click', async () => {

@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose'); 
 const sseMW = require('./sse');
-// const keys = require('./keys.json');
+const keys = require('./keys.json');
 
 const Task = require('./models/task');
 const Time = require('./models/time');
@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 //process.env.DATABASE_URL || keys.DATABASE_URL
-mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser:true});
+mongoose.connect(keys.DATABASE_URL, {useNewUrlParser:true});
 const db = mongoose.connection;
 db.once('open', () => app.listen(port, () => console.log(`Starting server at ${port}`)));
 db.on('error', (error) => console.log(error));
@@ -346,6 +346,11 @@ app.post('/setTime', async (request,response) => {
         var sendData = {data:endTime, target: "endTime"};
         sseConnection.send(sendData);
     }, this);
+});
+
+app.post('/submitScoutingData', (req,res) => {
+    console.log(req.body);
+    res.sendStatus(201);
 });
 
 // Update tasks, and time

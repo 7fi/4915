@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="scouting.js" defer></script>
+    <title>Task Manager / Timer</title>
+    <meta name="viewport" content="width = device-width, initial-scale=1.0">
+</head>
+<body id="body">
+    <div id="header">
+        <a id="title" href="index.html">Test Scouting App</a>
+
+        <div id="navContainer">
+            <div id="navBar">
+                <a class="navLink" href="team.html" style="opacity:0.6;">Team</a>
+                <a class="navLink" href="mechanics.html">Mechanics</a>
+                <a class="navLink" href="electronics.html" >Electronics</a>
+                <a class="navLink" href="programming.html">Programming</a>
+                <!-- <a class="navLink" href="electronics.html">Marketing</a>
+                <a class="navLink" href="electronics.html">Design</a> -->
+            </div>
+        </div>
+    </div>
+    <div id="test" style="display:none;background-color: red;width: 50%;left: 0;position: absolute;height: 100%;"></div>
+    <div id="loadingEl"></div>
+    <div class="scoutingSection">
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Name: </div>
+            <input class="scoutingInput" id="nameInput" placeholder="first name and last initial">
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Team Number: </div>
+            <input class="scoutingInput" id="teamNumInput" placeholder="ex: 4915">
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Match Number: </div>
+            <input class="scoutingInput" id="matchNumInput" placeholder="ex: 23">
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion"> Assigned Position: (TL = Top Left etc.) </div>
+            <div class="scoutingButtonHolder">
+                <button class="scoutingButton" id="assigned1">TL</button>
+                <button class="scoutingButton" id="assigned2">ML</button>
+                <button class="scoutingButton" id="assigned3">BL</button>
+                <button class="scoutingButton" id="assigned4">TR</button>
+                <button class="scoutingButton" id="assigned5">MR</button>
+                <button class="scoutingButton" id="assigned6">BR</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Did robot taxi?</div>
+            <div class="scoutingButtonHolder">
+                <button class="scoutingButton" id="taxiYes">Yes</button>
+                <button class="scoutingButton" id="taxiNo" >No</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Auto High Goals</div>
+            <div class="scoutingButtonHolder">
+                <div class="scoutingDisplayCount" id="autoHighNum">0</div>
+                <button class="scoutingButton" id="autoHighInc">+</button>
+                <button class="scoutingButton" id="autoHighDec">-</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Auto Low Goals</div>
+            <div class="scoutingButtonHolder">
+                <div class="scoutingDisplayCount" id="autoLowNum">0</div>
+                <button class="scoutingButton"id="autoLowInc">+</button>
+                <button class="scoutingButton"id="autoLowDec">-</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Teleop High Goals</div>
+            <div class="scoutingButtonHolder">
+                <div class="scoutingDisplayCount" id="teleHighNum">0</div>
+                <button class="scoutingButton" id="teleHighInc">+</button>
+                <button class="scoutingButton" id="teleHighDec">-</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Teleop Low Goals</div>
+            <div class="scoutingButtonHolder">
+                <div class="scoutingDisplayCount" id="teleLowNum">0</div>
+                <button class="scoutingButton"id="teleLowInc">+</button>
+                <button class="scoutingButton"id="teleLowDec">-</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Time Spent Defending: </div>
+            <input class="scoutingInput" id="timeDefend" placeholder="ex: 30 seconds (approximate)">
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Climb Level: </div>
+            <div class="scoutingButtonHolder">
+                <button class="scoutingButton" id="climb0">0</button>
+                <button class="scoutingButton" id="climb1">1</button>
+                <button class="scoutingButton" id="climb2">2</button>
+                <button class="scoutingButton" id="climb3">3</button>
+                <button class="scoutingButton" id="climb4">4</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion"># of Point lost to penalties on your teams aliance</div>
+            <div class="scoutingButtonHolder">
+                <div class="scoutingDisplayCount" id="penaltyCount">0</div>
+                <button class="scoutingButton"id="penaltyInc">+</button>
+                <button class="scoutingButton"id="penaltyDec">-</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">How well did they fufill their bots potential: </div>
+            <div class="scoutingButtonHolder">
+                <button class="scoutingButton" id="potential1">1</button>
+                <button class="scoutingButton" id="potential2">2</button>
+                <button class="scoutingButton" id="potential3">3</button>
+                <button class="scoutingButton" id="potential4">4</button>
+                <button class="scoutingButton" id="potential5">5</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Rate Their driving: </div>
+            <div class="scoutingButtonHolder">
+                <button class="scoutingButton" id="driving1">1</button>
+                <button class="scoutingButton" id="driving2">2</button>
+                <button class="scoutingButton" id="driving3">3</button>
+                <button class="scoutingButton" id="driving4">4</button>
+                <button class="scoutingButton" id="driving5">5</button>
+            </div>
+        </div>
+        <div class="scoutingDatapoint">
+            <div class="scoutingDataQuestion">Comments On Match: </div>
+            <input class="scoutingInput" id="commentInput" placeholder="Anything unusual about the match or bot.">
+        </div>
+        <div class="scoutingDatapoint">
+            <button id="scoutingSubmitButton">
+                Submit Data
+            </button>
+        </div>
+    </div>
+    
+    <div id="footer">
+        <a id="footerText" href="https://github.com/7fi" target="_blank">Site by 7fi</a>
+    </div>
+
+</body>
+
+</html>
