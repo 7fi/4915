@@ -344,8 +344,10 @@ submitButton.addEventListener('click', async () => {
     };
     loadingEl.style.display ='block';
     const response = await fetch('/submitScoutingData', options);
-    // const json = await response.json();
+    const json = await response.json();
     loadingEl.style.display ='none';
+
+    alert("Data Submitted!");
 
     location.reload();
 });

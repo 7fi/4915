@@ -1,23 +1,45 @@
+const dotenv = require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose'); 
 const sseMW = require('./sse');
-const keys = require('./keys.json');
+const {google} = require('googleapis');
+// const keys = require('./keys.json');
 
 const Task = require('./models/task');
 const Time = require('./models/time');
+const Row = require('./models/row');
+
+var row = 2;
 
 const app = express();
 
 const port = process.env.PORT || 3000;
 
 //process.env.DATABASE_URL || keys.DATABASE_URL
-mongoose.connect(keys.DATABASE_URL, {useNewUrlParser:true});
+mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser:true});
 const db = mongoose.connection;
 db.once('open', () => app.listen(port, () => console.log(`Starting server at ${port}`)));
 db.on('error', (error) => console.log(error));
 
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
+
+/* *************************** */
+const client = new google.auth.JWT(
+    process.env.client_email, 
+    null, 
+    process.env.private_key, 
+    ['https://www.googleapis.com/auth/spreadsheets']
+);
+
+client.authorize(function(err,tokens){
+    if(err){
+        console.log(err);
+        return;
+    }else{
+        console.log("Connected");
+    }
+});
 
 // Realtime updates
 var sseClients = new sseMW.Topic();
@@ -348,9 +370,79 @@ app.post('/setTime', async (request,response) => {
     }, this);
 });
 
-app.post('/submitScoutingData', (req,res) => {
+app.post('/submitScoutingData', async (req,res) => {
     console.log(req.body);
-    res.sendStatus(201);
+    var data = req.body;
+    
+    /*let values = [ // in order of input
+        [
+          data.name,
+          data.teamNum,
+          data.matchNum,
+          data.assignedPos,
+          data.taxi,
+          data.autoHighGoals,
+          data.autoLowGoals,
+          data.teleHighGoals,
+          data.teleLowGoals,
+          data.timeDefend,
+          data.climbLevel,
+          data.penalty,
+          data.potential,
+          data.driving,
+          data.comment
+        ]
+      ];*/
+      let values = [ // in order of spreadsheet
+        [
+            data.matchNum,
+            data.teamNum,
+            data.name,
+            data.assignedPos,
+            data.taxi,
+            data.autoHighGoals,
+            data.autoLowGoals,
+            data.teleHighGoals,
+            data.teleLowGoals,
+            data.timeDefend,
+            data.climbLevel,
+            data.penalty,
+            data.potential,
+            data.driving,
+            data.comment
+        ]
+      ];
+
+    const gsapi = google.sheets({version:'v4', auth: client});
+    const requestBody = {values};
+
+    var row;
+    Row.find({}, async function (err, docs){
+        console.log("DOCS:",docs);
+        row = docs[0].row;
+        row++;
+        var range = "B" + row + ":P" + row;
+        gsapi.spreadsheets.values.update({
+            spreadsheetId:"19b3SCivuMRup48d0L-UUBl0bGGbNWhJcgnO01dD2K0E",
+            range,
+            valueInputOption:"USER_ENTERED",
+            requestBody,
+            }, (err, result) => {
+            if (err) {
+                // Handle error
+                console.log(err);
+            } else {
+                console.log('%d cells updated.', result.updatedCells);
+            }   
+        });
+    });
+
+    await Row.deleteMany({},{ multi: true });
+    var tempRow = {row: row};
+    const saverRow = new Row(tempRow);
+    await saverRow.save();
+      
+    res.json({status:"sucess"});
 });
 
 // Update tasks, and time
