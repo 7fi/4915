@@ -355,6 +355,16 @@ input,button{
 .scoutingDisplayCount{
     margin:16px;
 }
+#assignedPosAlt{
+    display: none;
+}
+#penaltyAlt{
+    display: none;
+}
+
+#potentialAlt{
+    display:none;
+}
 
 @media only screen and (max-width:1000px){
     
@@ -396,5 +406,24 @@ input,button{
         position:fixed;
         right: 50%;
         top:50%;
+    }
+    #assignedPosTxt{
+        display: none;
+    }
+    #assignedPosAlt{
+        display: block;
+    }
+    #penaltyTxt{
+        display: none;
+    }
+    #penaltyAlt{
+        display: block;
+    }
+
+    #potentialTxt{
+        display:none;
+    }
+    #potentialAlt{
+        display:block;
     }
 }

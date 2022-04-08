@@ -40,7 +40,8 @@
             <input class="scoutingInput" id="matchNumInput" placeholder="ex: 23">
         </div>
         <div class="scoutingDatapoint">
-            <div class="scoutingDataQuestion"> Assigned Position: (TL = Top Left etc.) </div>
+            <div class="scoutingDataQuestion" id="assignedPosTxt">Assigned Position: (TL = Top Left etc.) </div>
+            <div class="scoutingDataQuestion" id="assignedPosAlt">Pos: </div>
             <div class="scoutingButtonHolder">
                 <button class="scoutingButton" id="assigned1">TL</button>
                 <button class="scoutingButton" id="assigned2">ML</button>
@@ -104,7 +105,8 @@
             </div>
         </div>
         <div class="scoutingDatapoint">
-            <div class="scoutingDataQuestion"># of Point lost to penalties on your teams aliance</div>
+            <div class="scoutingDataQuestion" id="penaltyTxt"># of Point lost to penalties on your teams aliance</div>
+            <div class="scoutingDataQuestion" id="penaltyAlt">Points lost from penalties</div>
             <div class="scoutingButtonHolder">
                 <div class="scoutingDisplayCount" id="penaltyCount">0</div>
                 <button class="scoutingButton"id="penaltyInc">+</button>
@@ -112,7 +114,8 @@
             </div>
         </div>
         <div class="scoutingDatapoint">
-            <div class="scoutingDataQuestion">How well did they fufill their bots potential: </div>
+            <div class="scoutingDataQuestion" id="potentialTxt">How well did they fufill their bots potential: </div>
+            <div class="scoutingDataQuestion" id="potentialAlt" style="font-size: 0.8rem; margin-top:17px;">Fufilled Potential: </div>
             <div class="scoutingButtonHolder">
                 <button class="scoutingButton" id="potential1">1</button>
                 <button class="scoutingButton" id="potential2">2</button>
@@ -122,7 +125,7 @@
             </div>
         </div>
         <div class="scoutingDatapoint">
-            <div class="scoutingDataQuestion">Rate Their driving: </div>
+            <div class="scoutingDataQuestion">Rate driving: </div>
             <div class="scoutingButtonHolder">
                 <button class="scoutingButton" id="driving1">1</button>
                 <button class="scoutingButton" id="driving2">2</button>
